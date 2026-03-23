@@ -1,791 +1,1703 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>xotiics plaza</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&display=swap');
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#000;overflow-x:hidden;font-family:'Share Tech Mono',monospace;}
-#c{display:block;width:100vw;height:100vh;position:fixed;top:0;left:0;z-index:0;}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>xotiic plaza</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none;
+        }
 
-/* Portal Overlay */
-#portal-wrap{
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  z-index:100;
-  background:#000;
-  transition:opacity 1.3s ease-in-out;
-}
-#portal-wrap.gone{
-  opacity:0;
-  pointer-events:none;
-}
-#overlay{
-  position:absolute;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  z-index:101;
-}
-.portal-ui{
-  position:relative;
-  width:520px;
-  height:520px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-.ring-wrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
-.r-outer{
-  position:absolute;width:380px;height:380px;border-radius:50%;
-  background:conic-gradient(from 0deg,
-    #1a0000 0deg, #5a0000 25deg, #aa1100 45deg,
-    #ff4400 62deg, #ff7700 72deg, #ffaa44 78deg,
-    #ff5500 88deg, #cc1100 110deg, #770000 140deg,
-    #3d0000 170deg, #1a0000 200deg, #2d0000 230deg,
-    #550000 260deg, #991100 285deg, #dd3300 305deg,
-    #ff5500 322deg, #ff7700 330deg, #cc2200 345deg,
-    #1a0000 360deg);
-  -webkit-mask:radial-gradient(circle,transparent 44%,#000 46%,#000 100%);
-  mask:radial-gradient(circle,transparent 44%,#000 46%,#000 100%);
-  animation:ringSpin 7s linear infinite;
-  filter:drop-shadow(0 0 2px rgba(255,100,0,0.6));
-}
-.r-spec{
-  position:absolute;width:380px;height:380px;border-radius:50%;
-  -webkit-mask:radial-gradient(circle,transparent 44%,#000 45.5%,#000 54.5%,transparent 56%);
-  mask:radial-gradient(circle,transparent 44%,#000 45.5%,#000 54.5%,transparent 56%);
-  background:conic-gradient(from 0deg,
-    transparent 0deg, transparent 50deg,
-    rgba(255,230,180,0.0) 60deg,
-    rgba(255,230,180,0.7) 68deg,
-    rgba(255,255,220,1.0) 74deg,
-    rgba(255,200,120,0.7) 80deg,
-    rgba(255,100,20,0.0) 92deg,
-    transparent 360deg);
-  animation:ringSpin 2.8s linear infinite reverse;
-}
-.r-spec2{
-  position:absolute;width:380px;height:380px;border-radius:50%;
-  -webkit-mask:radial-gradient(circle,transparent 44%,#000 45.5%,#000 54.5%,transparent 56%);
-  mask:radial-gradient(circle,transparent 44%,#000 45.5%,#000 54.5%,transparent 56%);
-  background:conic-gradient(from 0deg,
-    transparent 0deg, transparent 160deg,
-    rgba(255,100,20,0.0) 175deg,
-    rgba(255,160,80,0.5) 182deg,
-    rgba(255,200,120,0.7) 186deg,
-    rgba(255,120,40,0.4) 192deg,
-    rgba(255,80,0,0.0) 200deg,
-    transparent 360deg);
-  animation:ringSpin 3.9s linear infinite;
-}
-.r-bevel{
-  position:absolute;width:380px;height:380px;border-radius:50%;
-  -webkit-mask:radial-gradient(circle,transparent 43%,#000 44%,#000 46%,transparent 47%);
-  mask:radial-gradient(circle,transparent 43%,#000 44%,#000 46%,transparent 47%);
-  background:conic-gradient(from 160deg,
-    rgba(255,220,160,0.9),rgba(255,100,20,0.4),
-    rgba(100,0,0,0.1),rgba(40,0,0,0.05),
-    rgba(200,60,0,0.3),rgba(255,180,80,0.8),
-    rgba(255,220,160,0.9));
-  animation:ringSpin 7s linear infinite;
-}
-.r-glow{
-  position:absolute;width:388px;height:388px;border-radius:50%;
-  background:transparent;
-  box-shadow:
-    0 0 0 1.5px rgba(255,80,0,0.3),
-    0 0 12px 4px rgba(255,40,0,0.35),
-    0 0 35px 10px rgba(200,0,0,0.25),
-    0 0 70px 20px rgba(150,0,0,0.15),
-    inset 0 0 0 1.5px rgba(255,60,0,0.2);
-  animation:glowPulse 2.4s ease-in-out infinite;
-}
-.r-void{
-  position:absolute;width:325px;height:325px;border-radius:50%;
-  background:radial-gradient(circle at 50% 50%, #0a0000 0%, #060000 40%, #000 70%);
-  overflow:hidden;
-}
-.void-swirl1{
-  position:absolute;inset:-20px;border-radius:50%;
-  background:conic-gradient(from 0deg, transparent,rgba(80,0,0,0.12),transparent,rgba(60,0,0,0.08),transparent);
-  animation:vswirl 9s linear infinite;
-}
-.void-swirl2{
-  position:absolute;inset:-20px;border-radius:50%;
-  background:conic-gradient(from 90deg, transparent,rgba(50,0,0,0.07),transparent,rgba(40,0,0,0.05),transparent);
-  animation:vswirl 14s linear infinite reverse;
-}
-.void-inner{
-  position:absolute;inset:0;border-radius:50%;
-  background:radial-gradient(circle,rgba(0,0,0,0) 0%,rgba(0,0,0,0.4) 60%,rgba(0,0,0,0.9) 100%);
-}
-.vring{
-  position:absolute;
-  border-radius:50%;
-  border:1px solid rgba(120,0,0,0.06);
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  animation:vdepth 5s ease-in-out infinite;
-}
-.flare-wrap{position:absolute;inset:0;pointer-events:none;}
-.fl-core{
-  position:absolute;width:18px;height:18px;border-radius:50%;
-  background:radial-gradient(circle,#fffff0 0%,#ffdd88 35%,rgba(255,150,20,0.3) 70%,transparent 100%);
-  top:14%;left:20%;
-  box-shadow:0 0 8px 3px rgba(255,240,180,0.8),0 0 20px 6px rgba(255,150,0,0.4);
-  animation:flcore 0.25s ease-in-out infinite alternate;
-}
-.fl-streak{
-  position:absolute;
-  width:140px;height:1px;
-  background:linear-gradient(90deg,rgba(255,230,150,0.7),rgba(255,200,80,0.15),transparent);
-  top:calc(14% + 8px);left:calc(20% + 9px);
-  transform:rotate(-12deg);transform-origin:left center;
-}
-.portal-label{
-  position:absolute;bottom:28px;left:50%;transform:translateX(-50%);
-  font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:10px;
-  color:rgba(255,55,0,0.65);text-transform:uppercase;white-space:nowrap;
-  text-shadow:0 0 12px rgba(255,0,0,0.7),0 0 25px rgba(180,0,0,0.4);
-  animation:lbreath 2.2s ease-in-out infinite;
-}
-.enter-prompt{
-  position:absolute;bottom:8px;left:50%;transform:translateX(-50%);
-  font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px;
-  color:rgba(160,20,0,0.8);white-space:nowrap;
-  animation:blink 1.2s step-end infinite;cursor:pointer;pointer-events:all;
-  background:transparent;border:none;text-transform:uppercase;
-}
-.enter-prompt:hover{color:#ff4400;}
+        body {
+            background: #000;
+            overflow-x: hidden;
+            font-family: 'Share Tech Mono', monospace;
+        }
 
-/* Cursor */
-#cursor{position:fixed;width:8px;height:8px;background:#ff2200;border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);box-shadow:0 0 8px #ff2200,0 0 16px rgba(255,0,0,0.4);}
-#cursor-ring{position:fixed;width:28px;height:28px;border:1px solid rgba(255,50,0,0.45);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:transform .12s ease-out;}
+        /* Custom Cursor */
+        .cursor {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            background: #ff3300;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10000;
+            transition: transform 0.05s ease;
+            box-shadow: 0 0 15px #ff3300, 0 0 30px rgba(255, 51, 0, 0.5);
+        }
 
-/* Main Site */
-#main{
-  opacity:0;
-  visibility:hidden;
-  transition:opacity 1.2s ease-in;
-  position:relative;
-  z-index:50;
-}
-#main.show{
-  opacity:1;
-  visibility:visible;
-}
-.bg{
-  position:fixed;
-  inset:0;
-  background:radial-gradient(ellipse 70% 70% at 15% 20%,rgba(90,0,0,0.14) 0%,transparent 60%),#000;
-  z-index:-1;
-}
-.container{max-width:1200px;margin:0 auto;padding:20px;position:relative;}
-header{display:flex;justify-content:space-between;align-items:center;padding:20px 0;border-bottom:1px solid rgba(139,0,0,0.35);margin-bottom:50px;flex-wrap:wrap;}
-.logo{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:6px;background:linear-gradient(135deg,#ff3300,#cc0000,#ff6600);-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 10px rgba(255,30,0,0.4));}
-.logo span{font-family:'Share Tech Mono',monospace;font-size:11px;display:block;letter-spacing:3px;color:#333;-webkit-text-fill-color:#333;filter:none;}
-nav{display:flex;gap:28px;}
-nav a{color:#555;text-decoration:none;font-size:12px;text-transform:uppercase;letter-spacing:2px;transition:.3s;}
-nav a:hover{color:#ff2200;}
-.hero{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;margin-bottom:100px;}
-.hero-content h1{font-family:'Bebas Neue',sans-serif;font-size:52px;line-height:1.1;letter-spacing:3px;margin-bottom:18px;}
-.hero-content h1 span{color:#ff1a1a;display:block;font-size:80px;text-shadow:0 0 40px rgba(255,0,0,0.35),0 0 80px rgba(180,0,0,0.18);line-height:1;}
-.hero-content p{color:#555;margin-bottom:28px;font-size:13px;line-height:1.9;}
-.hero-buttons{display:flex;gap:14px;}
-.btn{padding:11px 28px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .3s;text-decoration:none;display:inline-block;}
-.btn-primary{background:linear-gradient(135deg,#8b0000,#cc0000);color:#fff;border:none;}
-.btn-primary:hover{background:linear-gradient(135deg,#cc0000,#ff3300);transform:translateY(-2px);box-shadow:0 8px 25px rgba(200,0,0,0.35);}
-.btn-secondary{background:transparent;color:#444;border:1px solid #1e1e1e;}
-.btn-secondary:hover{color:#ff2200;border-color:#8b0000;transform:translateY(-2px);}
-.hero-stats{display:flex;gap:40px;margin-top:48px;}
-.stat-number{font-family:'Bebas Neue',sans-serif;font-size:40px;color:#ff1a1a;line-height:1;text-shadow:0 0 18px rgba(255,0,0,0.35);}
-.stat-label{font-family:'Share Tech Mono',monospace;color:#2a2a2a;font-size:10px;letter-spacing:2px;margin-top:4px;}
-.terminal-window{background:#060606;border-radius:7px;overflow:hidden;border:1px solid #141414;box-shadow:0 20px 60px rgba(0,0,0,0.8);}
-.terminal-header{background:#0d0d0d;padding:10px 14px;display:flex;gap:7px;align-items:center;border-bottom:1px solid #141414;}
-.dot{width:11px;height:11px;border-radius:50%;}
-.dot.r{background:#ff5f56;}.dot.y{background:#ffbd2e}.dot.g{background:#27c93f}
-.terminal-body{padding:18px;font-family:'Share Tech Mono',monospace;font-size:12px;line-height:2;}
-.prompt{color:#cc0000;}.output{color:#333;}
-.section-title{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:4px;margin-bottom:38px;border-left:3px solid #8b0000;padding-left:20px;}
-.projects-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:22px;margin-bottom:100px;}
-.project-card{background:#080808;border:1px solid #111;border-radius:5px;overflow:hidden;transition:all .4s;}
-.project-card:hover{border-color:rgba(139,0,0,0.45);transform:translateY(-5px);box-shadow:0 18px 40px rgba(0,0,0,0.6);}
-.project-image{height:160px;background:linear-gradient(135deg,#0c0000,#080808);display:flex;align-items:center;justify-content:center;color:#141414;font-family:'Bebas Neue',sans-serif;font-size:48px;letter-spacing:4px;border-bottom:1px solid #111;}
-.project-content{padding:18px;}
-.project-title{font-size:15px;font-weight:700;margin-bottom:7px;letter-spacing:1px;color:#fff;}
-.project-desc{color:#333;font-size:12px;margin-bottom:13px;line-height:1.7;}
-.project-tech{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:13px;}
-.tech-tag{background:rgba(139,0,0,0.1);color:#660000;padding:2px 8px;font-size:10px;border-radius:2px;font-family:'Share Tech Mono',monospace;letter-spacing:1px;}
-.cat-badge{display:inline-block;padding:2px 9px;background:rgba(255,0,0,0.04);color:#3a0000;border:1px solid rgba(139,0,0,0.12);border-radius:2px;font-size:9px;margin-bottom:8px;text-transform:uppercase;letter-spacing:2px;}
-.project-link{color:#cc0000;font-size:11px;text-decoration:none;font-family:'Share Tech Mono',monospace;margin-right:12px;}
-.download-link{color:#1a6e1a;font-size:11px;text-decoration:none;font-family:'Share Tech Mono',monospace;}
-.skills-container{display:grid;grid-template-columns:repeat(2,1fr);gap:25px 55px;margin-bottom:100px;}
-.skill-header{display:flex;justify-content:space-between;margin-bottom:7px;}
-.skill-header span:first-child{font-family:'Share Tech Mono',monospace;font-size:11px;color:#666;letter-spacing:1px;}
-.skill-header span:last-child{font-family:'Bebas Neue',sans-serif;font-size:18px;color:#cc0000;}
-.skill-bar-bg{height:2px;background:#0f0f0f;position:relative;}
-.skill-bar-fill{height:100%;background:linear-gradient(90deg,#4d0000,#cc0000,#ff3300);position:relative;}
-.skill-bar-fill::after{content:'';position:absolute;right:0;top:-3px;width:7px;height:7px;background:#cc0000;border-radius:50%;box-shadow:0 0 6px #cc0000;}
-.contact-container{display:grid;grid-template-columns:1fr 1fr;gap:55px;margin-bottom:100px;}
-.contact-info h3{color:#cc0000;margin-bottom:22px;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;}
-.contact-detail{display:flex;align-items:center;gap:14px;margin-bottom:18px;color:#444;font-size:12px;}
-.contact-form input,.contact-form textarea{width:100%;padding:11px 14px;margin-bottom:13px;background:#060606;border:1px solid #141414;color:#888;border-radius:3px;font-family:'Share Tech Mono',monospace;font-size:11px;transition:border-color .3s;}
-.contact-form input:focus,.contact-form textarea:focus{outline:none;border-color:rgba(139,0,0,0.4);}
-.contact-form textarea{min-height:100px;resize:vertical;}
-footer{border-top:1px solid #0d0d0d;padding:38px 0;display:flex;justify-content:space-between;align-items:center;color:#1e1e1e;flex-wrap:wrap;gap:14px;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;}
-.footer-links{display:flex;gap:22px;}
-.footer-links a{color:#1e1e1e;text-decoration:none;transition:color .3s;}
-.footer-links a:hover{color:#cc0000;}
-.visitor-counter{background:#060606;padding:5px 13px;border:1px solid #111;border-radius:2px;color:#222;}
-.empty-block{background:#060606;border:1px dashed #141414;border-radius:3px;padding:20px;text-align:center;color:#1e1e1e;font-size:12px;}
+        .cursor-trail {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 51, 0, 0.6);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transition: opacity 0.3s ease;
+        }
 
-/* Owner Panel */
-.owner-view{display:none;}
-body.owner-mode #main{display:none;}
-body.owner-mode .owner-view{display:block;}
-.owner-panel{max-width:900px;margin:0 auto;padding:20px;}
-.login-box{background:#070707;border:1px solid #141414;border-radius:7px;padding:38px;text-align:center;max-width:370px;margin:90px auto;}
-.login-box h2{color:#cc0000;margin-bottom:18px;font-family:'Bebas Neue',sans-serif;letter-spacing:4px;}
-.login-box input{width:100%;padding:11px;margin:9px 0;background:#0a0a0a;border:1px solid #1a1a1a;color:#888;border-radius:3px;font-family:'Share Tech Mono',monospace;font-size:12px;}
-.login-box button{width:100%;padding:12px;background:linear-gradient(135deg,#8b0000,#cc0000);color:#fff;border:none;border-radius:3px;cursor:pointer;margin-top:18px;font-family:'Bebas Neue',sans-serif;letter-spacing:3px;font-size:15px;}
-.error-message{color:#cc0000;margin:8px 0;display:none;font-size:11px;}
-.admin-dashboard{background:#070707;border:1px solid #141414;border-radius:7px;padding:28px;margin-top:28px;}
-.admin-section{margin-bottom:38px;padding-bottom:28px;border-bottom:1px solid #111;}
-.admin-section h3{color:#cc0000;margin-bottom:18px;font-family:'Bebas Neue',sans-serif;letter-spacing:3px;font-size:19px;}
-.admin-form-group{margin-bottom:16px;}
-.admin-form-group label{display:block;color:#2a2a2a;margin-bottom:4px;font-size:9px;text-transform:uppercase;letter-spacing:2px;font-family:'Share Tech Mono',monospace;}
-.admin-form-group input,.admin-form-group textarea,.admin-form-group select{width:100%;padding:9px 11px;background:#0a0a0a;border:1px solid #1a1a1a;color:#777;border-radius:2px;font-family:'Share Tech Mono',monospace;font-size:11px;}
-.admin-row{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
-.admin-item{background:#0a0a0a;border:1px solid #141414;border-radius:3px;padding:16px;margin-bottom:13px;}
-.admin-item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px;}
-.remove-btn{background:rgba(139,0,0,0.4);color:#fff;border:none;padding:3px 9px;border-radius:2px;cursor:pointer;font-size:10px;}
-.admin-btn{background:linear-gradient(135deg,#8b0000,#aa0000);color:#fff;border:none;padding:9px 22px;border-radius:2px;cursor:pointer;margin-right:9px;margin-bottom:9px;font-family:'Bebas Neue',sans-serif;letter-spacing:2px;font-size:14px;}
-.admin-btn.secondary{background:#111;}
-.admin-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;flex-wrap:wrap;}
-.admin-header h2{font-family:'Bebas Neue',sans-serif;letter-spacing:4px;color:#cc0000;font-size:26px;}
-.logout-btn{background:transparent;border:1px solid rgba(139,0,0,0.35);color:#444;padding:6px 16px;border-radius:2px;cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:10px;}
+        .cursor-ring {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(255, 51, 0, 0.6);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            transition: all 0.15s ease;
+            transform: translate(-50%, -50%);
+        }
 
-/* Animations */
-@keyframes ringSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-@keyframes glowPulse{0%,100%{box-shadow:0 0 0 1.5px rgba(255,80,0,0.3),0 0 12px 4px rgba(255,40,0,0.35),0 0 35px 10px rgba(200,0,0,0.25),0 0 70px 20px rgba(150,0,0,0.15)}50%{box-shadow:0 0 0 2px rgba(255,120,0,0.5),0 0 18px 6px rgba(255,60,0,0.55),0 0 55px 16px rgba(220,0,0,0.38),0 0 110px 32px rgba(170,0,0,0.22)}}
-@keyframes vswirl{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-@keyframes vdepth{0%,100%{opacity:.25;transform:translate(-50%,-50%) scale(1)}50%{opacity:.55;transform:translate(-50%,-50%) scale(.97)}}
-@keyframes flcore{from{opacity:.75;transform:scale(.92)}to{opacity:1;transform:scale(1.08)}}
-@keyframes lbreath{0%,100%{opacity:.45;letter-spacing:10px}50%{opacity:1;letter-spacing:12px}}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+        /* Portal Overlay */
+        .portal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-@media(max-width:768px){
-  .hero,.skills-container,.contact-container{grid-template-columns:1fr;}
-  .portal-ui{width:320px;height:320px;}
-  .r-outer,.r-spec,.r-spec2,.r-bevel,.r-glow{width:250px;height:250px;}
-  .r-void{width:216px;height:216px;}
-  .hero-content h1 span{font-size:48px;}
-  .logo{font-size:24px;}
-}
-</style>
+        .portal-overlay.hide {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .portal-container {
+            position: relative;
+            width: 600px;
+            height: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            perspective: 1000px;
+        }
+
+        /* Hyperrealistic Portal Rings */
+        .portal-ring-outer {
+            position: absolute;
+            width: 450px;
+            height: 450px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, 
+                rgba(255, 80, 0, 0.8) 0%,
+                rgba(180, 40, 0, 0.6) 40%,
+                rgba(100, 20, 0, 0.3) 70%,
+                transparent 100%);
+            box-shadow: 
+                0 0 80px rgba(255, 51, 0, 0.6),
+                0 0 150px rgba(255, 51, 0, 0.4),
+                inset 0 0 60px rgba(255, 51, 0, 0.3);
+            animation: ringPulse 2s ease-in-out infinite;
+        }
+
+        .portal-ring-mid {
+            position: absolute;
+            width: 380px;
+            height: 380px;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg,
+                #ff4400, #ff2200, #cc3300, #ff4400, #ff6600, #ff4400);
+            animation: ringSpin 8s linear infinite;
+            filter: blur(2px);
+        }
+
+        .portal-ring-mid::before {
+            content: '';
+            position: absolute;
+            inset: 15px;
+            border-radius: 50%;
+            background: #000;
+        }
+
+        .portal-ring-inner {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle,
+                rgba(255, 100, 0, 0.9) 0%,
+                rgba(200, 50, 0, 0.7) 20%,
+                rgba(100, 20, 0, 0.4) 50%,
+                transparent 80%);
+            animation: ringGlow 1.5s ease-in-out infinite alternate;
+        }
+
+        .portal-core {
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: radial-gradient(circle,
+                #ff6600 0%,
+                #ff3300 30%,
+                #cc2200 60%,
+                #4a0000 100%);
+            animation: corePulse 1.2s ease-in-out infinite;
+            box-shadow: 0 0 60px #ff3300, inset 0 0 30px rgba(255, 255, 200, 0.8);
+        }
+
+        .portal-core::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 60%;
+            height: 60%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            background: radial-gradient(circle, #fff 0%, #ffaa66 50%, transparent 80%);
+            animation: coreGlow 0.8s ease-in-out infinite alternate;
+        }
+
+        /* Energy Particles */
+        .energy-particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #ff6600;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #ff6600;
+            pointer-events: none;
+        }
+
+        /* Lightning Bolts */
+        .lightning {
+            position: absolute;
+            background: linear-gradient(90deg, #ffaa44, #ff4400, #ffaa44);
+            filter: blur(1px);
+            opacity: 0.7;
+        }
+
+        .portal-text {
+            position: absolute;
+            bottom: -80px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #ff3300;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 24px;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            white-space: nowrap;
+            text-shadow: 0 0 20px #ff3300, 0 0 40px rgba(255, 51, 0, 0.5);
+            animation: textPulse 1.5s ease-in-out infinite;
+        }
+
+        .enter-btn {
+            position: absolute;
+            bottom: -140px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: transparent;
+            border: 2px solid #ff3300;
+            color: #ff3300;
+            padding: 12px 40px;
+            cursor: pointer;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 14px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+        }
+
+        .enter-btn:hover {
+            background: #ff3300;
+            color: #000;
+            box-shadow: 0 0 40px #ff3300;
+            transform: translateX(-50%) scale(1.05);
+        }
+
+        /* Animations */
+        @keyframes ringPulse {
+            0%, 100% { transform: scale(1); opacity: 0.9; box-shadow: 0 0 80px rgba(255, 51, 0, 0.6); }
+            50% { transform: scale(1.05); opacity: 1; box-shadow: 0 0 150px rgba(255, 51, 0, 0.9); }
+        }
+
+        @keyframes ringSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes ringGlow {
+            0% { opacity: 0.6; transform: scale(0.95); }
+            100% { opacity: 1; transform: scale(1.05); }
+        }
+
+        @keyframes corePulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 60px #ff3300; }
+            50% { transform: scale(1.1); box-shadow: 0 0 100px #ff6600; }
+        }
+
+        @keyframes coreGlow {
+            0% { opacity: 0.7; transform: translate(-50%, -50%) scale(0.8); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        @keyframes textPulse {
+            0%, 100% { opacity: 0.7; letter-spacing: 8px; text-shadow: 0 0 20px #ff3300; }
+            50% { opacity: 1; letter-spacing: 12px; text-shadow: 0 0 40px #ff3300, 0 0 60px #ff3300; }
+        }
+
+        @keyframes particleFloat {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--dx), var(--dy)) scale(0);
+                opacity: 0;
+            }
+        }
+
+        @keyframes lightningFlash {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* Main Site */
+        .main-site {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .main-site.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .bg {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse at 50% 50%, #1a0000 0%, #000 100%);
+            z-index: -2;
+        }
+
+        .particle-bg {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .bg-particle {
+            position: absolute;
+            background: rgba(255, 51, 0, 0.3);
+            border-radius: 50%;
+            animation: float 20s linear infinite;
+        }
+
+        @keyframes float {
+            from { transform: translateY(100vh) rotate(0deg); }
+            to { transform: translateY(-100vh) rotate(360deg); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 2px solid rgba(139, 0, 0, 0.5);
+            margin-bottom: 50px;
+            flex-wrap: wrap;
+            animation: slideDown 0.8s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 36px;
+            letter-spacing: 6px;
+            background: linear-gradient(135deg, #ff3300, #ff6600, #ff3300);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(255, 51, 0, 0.3);
+            animation: glowPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes glowPulse {
+            0%, 100% { text-shadow: 0 0 20px rgba(255, 51, 0, 0.3); }
+            50% { text-shadow: 0 0 40px rgba(255, 51, 0, 0.6); }
+        }
+
+        .logo span {
+            font-size: 11px;
+            display: block;
+            color: #444;
+            -webkit-text-fill-color: #444;
+            letter-spacing: 3px;
+        }
+
+        nav {
+            display: flex;
+            gap: 35px;
+        }
+
+        nav a {
+            color: #888;
+            text-decoration: none;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        nav a::before {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #ff3300;
+            transition: width 0.3s ease;
+        }
+
+        nav a:hover::before {
+            width: 100%;
+        }
+
+        nav a:hover {
+            color: #ff3300;
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            margin-bottom: 80px;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-content h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 52px;
+            line-height: 1.1;
+        }
+
+        .hero-content h1 span {
+            color: #ff3300;
+            display: block;
+            font-size: 80px;
+            text-shadow: 0 0 40px rgba(255, 51, 0, 0.5);
+            animation: textReveal 0.8s ease-out;
+        }
+
+        @keyframes textReveal {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .hero-content p {
+            color: #888;
+            margin: 20px 0;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #8b0000, #ff3300);
+            color: #fff;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 51, 0, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #888;
+            border: 1px solid #333;
+        }
+
+        .btn-secondary:hover {
+            color: #ff3300;
+            border-color: #ff3300;
+            transform: translateY(-3px);
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 50px;
+            margin-top: 50px;
+        }
+
+        .stat-item {
+            text-align: center;
+            animation: fadeInScale 0.5s ease-out both;
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .stat-number {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 42px;
+            color: #ff3300;
+            text-shadow: 0 0 20px rgba(255, 51, 0, 0.5);
+        }
+
+        .stat-label {
+            font-size: 10px;
+            color: #666;
+            letter-spacing: 2px;
+        }
+
+        .terminal {
+            background: rgba(6, 6, 6, 0.9);
+            border: 1px solid rgba(139, 0, 0, 0.3);
+            border-radius: 12px;
+            overflow: hidden;
+            backdrop-filter: blur(5px);
+            animation: fadeInRight 0.8s ease-out 0.3s both;
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .terminal-header {
+            background: rgba(13, 13, 13, 0.9);
+            padding: 12px 16px;
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid rgba(139, 0, 0, 0.3);
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .dot.red { background: #ff5f56; }
+        .dot.yellow { background: #ffbd2e; }
+        .dot.green { background: #27c93f; }
+
+        .terminal-body {
+            padding: 20px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 12px;
+            line-height: 2;
+        }
+
+        .prompt {
+            color: #ff3300;
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .output {
+            color: #666;
+            position: relative;
+            display: inline-block;
+        }
+
+        .typing {
+            overflow: hidden;
+            white-space: nowrap;
+            animation: typing 2s steps(40, end);
+        }
+
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        /* Rest of the styles... */
+        .section-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 42px;
+            margin: 60px 0 30px;
+            border-left: 4px solid #ff3300;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 20px;
+            width: 50px;
+            height: 2px;
+            background: linear-gradient(90deg, #ff3300, transparent);
+        }
+
+        .filters {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 35px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: transparent;
+            border: 1px solid #222;
+            color: #666;
+            padding: 8px 20px;
+            cursor: pointer;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .filter-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 51, 0, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .filter-btn:hover::before {
+            left: 100%;
+        }
+
+        .filter-btn.active, .filter-btn:hover {
+            background: #ff3300;
+            color: #000;
+            border-color: #ff3300;
+            box-shadow: 0 0 20px rgba(255, 51, 0, 0.3);
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .project-card {
+            background: rgba(8, 8, 8, 0.8);
+            border: 1px solid #111;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(5px);
+            position: relative;
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 51, 0, 0.1), transparent);
+            transition: left 0.6s;
+        }
+
+        .project-card:hover::before {
+            left: 100%;
+        }
+
+        .project-card:hover {
+            border-color: #ff3300;
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 51, 0, 0.2);
+        }
+
+        .project-image {
+            height: 160px;
+            background: linear-gradient(135deg, #0c0000, #000);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-family: 'Bebas Neue', sans-serif;
+            border-bottom: 1px solid #111;
+            transition: all 0.3s ease;
+        }
+
+        .project-card:hover .project-image {
+            transform: scale(1.02);
+        }
+
+        .project-content {
+            padding: 20px;
+        }
+
+        .cat-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(255, 51, 0, 0.15);
+            color: #ff3300;
+            font-size: 10px;
+            border-radius: 20px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .project-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .project-desc {
+            color: #666;
+            font-size: 12px;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .project-tech {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .tech-tag {
+            background: rgba(255, 51, 0, 0.1);
+            color: #ff6600;
+            padding: 4px 10px;
+            font-size: 10px;
+            border-radius: 20px;
+        }
+
+        .project-link, .download-link {
+            font-size: 11px;
+            text-decoration: none;
+            margin-right: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .project-link {
+            color: #ff3300;
+        }
+
+        .project-link:hover {
+            text-shadow: 0 0 10px #ff3300;
+        }
+
+        .download-link {
+            color: #4caf50;
+        }
+
+        .skills-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+
+        .skill-item {
+            margin-bottom: 20px;
+            animation: slideInLeft 0.5s ease-out both;
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .skill-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: #888;
+        }
+
+        .skill-bar {
+            height: 3px;
+            background: #111;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .skill-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #8b0000, #ff3300, #ff6600);
+            width: 0%;
+            transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            border-radius: 2px;
+        }
+
+        .skill-fill::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: -2px;
+            width: 6px;
+            height: 7px;
+            background: #ff3300;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #ff3300;
+        }
+
+        .contact-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            margin-bottom: 60px;
+        }
+
+        .contact-info h3 {
+            color: #ff3300;
+            margin-bottom: 25px;
+            font-size: 24px;
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 2px;
+        }
+
+        .contact-detail {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            color: #888;
+            font-size: 13px;
+            transition: all 0.3s ease;
+        }
+
+        .contact-detail:hover {
+            color: #ff3300;
+            transform: translateX(5px);
+        }
+
+        .contact-detail span:first-child {
+            font-size: 20px;
+        }
+
+        .contact-form input, .contact-form textarea {
+            width: 100%;
+            padding: 12px 16px;
+            margin-bottom: 15px;
+            background: rgba(8, 8, 8, 0.8);
+            border: 1px solid #1a1a1a;
+            color: #fff;
+            border-radius: 8px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .contact-form input:focus, .contact-form textarea:focus {
+            outline: none;
+            border-color: #ff3300;
+            box-shadow: 0 0 20px rgba(255, 51, 0, 0.2);
+            transform: scale(1.01);
+        }
+
+        .contact-form textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        footer {
+            border-top: 1px solid #111;
+            padding: 40px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #444;
+            font-size: 11px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .footer-links a {
+            color: #444;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #ff3300;
+            transform: translateY(-2px);
+        }
+
+        .visitor-counter {
+            background: rgba(6, 6, 6, 0.8);
+            padding: 6px 16px;
+            border: 1px solid #111;
+            border-radius: 20px;
+            font-size: 11px;
+        }
+
+        .empty-block {
+            text-align: center;
+            padding: 50px;
+            color: #444;
+            border: 1px dashed #222;
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        /* Owner Panel */
+        .owner-view {
+            display: none;
+        }
+
+        body.owner-mode .main-site {
+            display: none;
+        }
+
+        body.owner-mode .owner-view {
+            display: block;
+        }
+
+        .owner-panel {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .login-box {
+            background: rgba(8, 8, 8, 0.95);
+            border: 1px solid #222;
+            border-radius: 16px;
+            padding: 50px;
+            text-align: center;
+            max-width: 380px;
+            margin: 100px auto;
+            backdrop-filter: blur(10px);
+        }
+
+        .login-box h2 {
+            color: #ff3300;
+            margin-bottom: 25px;
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 4px;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 12px;
+            margin: 12px 0;
+            background: #000;
+            border: 1px solid #222;
+            color: #fff;
+            border-radius: 8px;
+        }
+
+        .login-box button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #8b0000, #ff3300);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .login-box button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 51, 0, 0.3);
+        }
+
+        .admin-panel {
+            background: rgba(8, 8, 8, 0.95);
+            border: 1px solid #222;
+            border-radius: 16px;
+            padding: 35px;
+            margin-top: 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 35px;
+            flex-wrap: wrap;
+        }
+
+        .admin-header h2 {
+            color: #ff3300;
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 3px;
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: 1px solid #ff3300;
+            color: #ff3300;
+            padding: 8px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #ff3300;
+            color: #000;
+        }
+
+        .admin-section {
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #1a1a1a;
+        }
+
+        .admin-section h3 {
+            color: #ff3300;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        .admin-form-group {
+            margin-bottom: 18px;
+        }
+
+        .admin-form-group label {
+            display: block;
+            font-size: 10px;
+            color: #888;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .admin-form-group input, .admin-form-group textarea, .admin-form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            background: #000;
+            border: 1px solid #222;
+            color: #fff;
+            border-radius: 6px;
+        }
+
+        .admin-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .admin-item {
+            background: #000;
+            border: 1px solid #222;
+            padding: 18px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+        }
+
+        .admin-item-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .remove-btn {
+            background: #8b0000;
+            color: #fff;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .admin-btn {
+            background: #ff3300;
+            color: #000;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-right: 12px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .admin-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 51, 0, 0.3);
+        }
+
+        .admin-btn.secondary {
+            background: #222;
+            color: #fff;
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                grid-template-columns: 1fr;
+            }
+            .skills-container, .contact-container {
+                grid-template-columns: 1fr;
+            }
+            .admin-row {
+                grid-template-columns: 1fr;
+            }
+            .portal-container {
+                width: 350px;
+                height: 350px;
+            }
+            .portal-ring-outer { width: 280px; height: 280px; }
+            .portal-ring-mid { width: 230px; height: 230px; }
+            .portal-ring-inner { width: 180px; height: 180px; }
+            .portal-core { width: 110px; height: 110px; }
+        }
+    </style>
 </head>
 <body>
 
-<div id="cursor"></div>
-<div id="cursor-ring"></div>
+<!-- Custom Cursor -->
+<div class="cursor"></div>
+<div class="cursor-ring"></div>
 
-<!-- PORTAL -->
-<div id="portal-wrap">
-  <canvas id="c"></canvas>
-  <div id="overlay">
-    <div class="portal-ui">
-      <div class="ring-wrap">
-        <div class="r-glow"></div>
-        <div class="r-outer"></div>
-        <div class="r-spec"></div>
-        <div class="r-spec2"></div>
-        <div class="r-bevel"></div>
-        <div class="r-void">
-          <div class="void-swirl1"></div>
-          <div class="void-swirl2"></div>
-          <div class="vring" style="width:78%;height:78%"></div>
-          <div class="vring" style="width:58%;height:58%;animation-delay:-1.5s"></div>
-          <div class="vring" style="width:38%;height:38%;animation-delay:-3s"></div>
-          <div class="void-inner"></div>
-        </div>
-        <div class="flare-wrap">
-          <div class="fl-core"></div>
-          <div class="fl-streak"></div>
-        </div>
-      </div>
-      <div class="portal-label">ENTER THE PLAZA</div>
-      <div class="enter-prompt" onclick="enterPortal()">[ CLICK TO ENTER ]</div>
+<!-- Portal Overlay -->
+<div id="portalOverlay" class="portal-overlay">
+    <div class="portal-container" id="portalContainer">
+        <div class="portal-ring-outer"></div>
+        <div class="portal-ring-mid"></div>
+        <div class="portal-ring-inner"></div>
+        <div class="portal-core"></div>
+        <div class="portal-text">XOTIIC PLAZA</div>
+        <button class="enter-btn" id="enterBtn">ENTER THE VOID</button>
     </div>
-  </div>
 </div>
 
-<!-- MAIN SITE -->
-<div id="main">
-  <div class="bg"></div>
-  <div class="container">
-    <header>
-      <div class="logo">XOTIIC<span>// BOTS • DOWNLOADS • WEBSITES</span></div>
-      <nav>
-        <a href="#home">Home</a><a href="#projects">Projects</a>
-        <a href="#skills">Skills</a><a href="#contact">Contact</a>
-      </nav>
-    </header>
+<!-- Main Site -->
+<div id="mainSite" class="main-site">
+    <div class="bg"></div>
+    <div class="container">
+        <header>
+            <div class="logo">XOTIIC'S PLAZA<span>// BOTS • DOWNLOADS • WEBSITES</span></div>
+            <nav>
+                <a href="#home">Home</a>
+                <a href="#projects">Projects</a>
+                <a href="#skills">Skills</a>
+                <a href="#contact">Contact</a>
+            </nav>
+        </header>
 
-    <section id="home" class="hero">
-      <div class="hero-content">
-        <h1><span id="userName">XOTIIC'S PLAZA</span>Code. Create. Innovate.</h1>
-        <p id="userBio">Full-stack developer specializing in modern websites and powerful Discord bots. Creating immersive digital experiences.</p>
-        <div class="hero-buttons">
-          <a href="#projects" class="btn btn-primary">View Work</a>
-          <a href="#contact" class="btn btn-secondary">Hire Me</a>
-        </div>
-        <div class="hero-stats">
-          <div><div class="stat-number" id="projectCount">—</div><div class="stat-label">PROJECTS</div></div>
-          <div><div class="stat-number" id="downloadCount">—</div><div class="stat-label">DOWNLOADS</div></div>
-          <div><div class="stat-number" id="userCount">—</div><div class="stat-label">USERS</div></div>
-        </div>
-      </div>
-      <div class="terminal-window">
-        <div class="terminal-header"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div></div>
-        <div class="terminal-body">
-          <div><span class="prompt">$</span> whoami</div>
-          <div class="output" id="terminalName">&gt; xotiic</div>
-          <div><span class="prompt">$</span> skills --list</div>
-          <div class="output" id="terminalSkills">&gt; HTML/CSS • JavaScript • Python • Discord.js • React</div>
-          <div><span class="prompt">$</span> status</div>
-          <div class="output" id="terminalStatus">&gt; Building the future</div>
-        </div>
-      </div>
-    </section>
+        <section id="home" class="hero">
+            <div class="hero-content">
+                <h1><span id="userName">XOTIIC</span>Code. Create. Innovate.</h1>
+                <p id="userBio">Full-stack developer specializing in modern websites and powerful Discord bots. Creating immersive digital experiences.</p>
+                <div class="hero-buttons">
+                    <a href="#projects" class="btn btn-primary">View Work</a>
+                    <a href="#contact" class="btn btn-secondary">Hire Me</a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat-item"><div class="stat-number" id="projectCount">—</div><div class="stat-label">PROJECTS</div></div>
+                    <div class="stat-item"><div class="stat-number" id="downloadCount">—</div><div class="stat-label">DOWNLOADS</div></div>
+                    <div class="stat-item"><div class="stat-number" id="userCount">—</div><div class="stat-label">USERS</div></div>
+                </div>
+            </div>
+            <div class="terminal">
+                <div class="terminal-header">
+                    <div class="dot red"></div>
+                    <div class="dot yellow"></div>
+                    <div class="dot green"></div>
+                </div>
+                <div class="terminal-body">
+                    <div><span class="prompt">$</span> whoami</div>
+                    <div class="output" id="terminalName">&gt; xotiic</div>
+                    <div><span class="prompt">$</span> skills --list</div>
+                    <div class="output" id="terminalSkills">&gt; HTML/CSS • JavaScript • Python • Discord.js • React</div>
+                    <div><span class="prompt">$</span> status</div>
+                    <div class="output" id="terminalStatus">&gt; Building the future</div>
+                </div>
+            </div>
+        </section>
 
-    <section id="projects">
-      <h2 class="section-title">Projects</h2>
-      <div style="display:flex;gap:10px;margin-bottom:28px;flex-wrap:wrap;">
-        <button class="btn btn-primary" style="padding:7px 16px;font-size:10px;" onclick="filterProjects('all',this)">All</button>
-        <button class="btn btn-secondary" style="padding:7px 16px;font-size:10px;" onclick="filterProjects('bot',this)">Bots</button>
-        <button class="btn btn-secondary" style="padding:7px 16px;font-size:10px;" onclick="filterProjects('download',this)">Downloads</button>
-        <button class="btn btn-secondary" style="padding:7px 16px;font-size:10px;" onclick="filterProjects('website',this)">Websites</button>
-      </div>
-      <div class="projects-grid" id="projectsGrid"></div>
-    </section>
+        <section id="projects">
+            <h2 class="section-title">Projects</h2>
+            <div class="filters">
+                <button class="filter-btn active" onclick="filterProjects('all')">All</button>
+                <button class="filter-btn" onclick="filterProjects('bot')">Bots</button>
+                <button class="filter-btn" onclick="filterProjects('download')">Downloads</button>
+                <button class="filter-btn" onclick="filterProjects('website')">Websites</button>
+            </div>
+            <div class="projects-grid" id="projectsGrid"></div>
+        </section>
 
-    <section id="skills">
-      <h2 class="section-title">Skills</h2>
-      <div class="skills-container" id="skillsContainer"></div>
-    </section>
+        <section id="skills">
+            <h2 class="section-title">Skills</h2>
+            <div class="skills-container" id="skillsContainer"></div>
+        </section>
 
-    <section id="contact">
-      <h2 class="section-title">Contact</h2>
-      <div class="contact-container">
-        <div class="contact-info">
-          <h3>Connect With Me</h3>
-          <div class="contact-detail"><span>📧</span> <span id="contactEmail">xotiic@example.com</span></div>
-          <div class="contact-detail"><span>💬</span> <span id="contactDiscord">xotiic</span></div>
-          <div class="contact-detail"><span>🐙</span> <span id="contactGithub">github.com/xotiic</span></div>
-          <div class="contact-detail"><span>🐦</span> <span id="contactTwitter">@xotiic</span></div>
-        </div>
-        <div class="contact-form">
-          <input type="text" placeholder="Your Name" id="contactName">
-          <input type="email" placeholder="Your Email" id="contactEmailInput">
-          <textarea placeholder="Your Message" id="contactMessage"></textarea>
-          <button class="btn btn-primary" onclick="sendMessage()">Send Message</button>
-        </div>
-      </div>
-    </section>
+        <section id="contact">
+            <h2 class="section-title">Contact</h2>
+            <div class="contact-container">
+                <div class="contact-info">
+                    <h3>Connect With Me</h3>
+                    <div class="contact-detail"><span></span> <span id="contactEmail">xotiic@example.com</span></div>
+                    <div class="contact-detail"><span></span> <span id="contactDiscord">xotiic</span></div>
+                    <div class="contact-detail"><span></span> <span id="contactGithub">github.com/xotiic</span></div>
+                    <div class="contact-detail"><span></span> <span id="contactTwitter">@xotiic</span></div>
+                </div>
+                <div class="contact-form">
+                    <input type="text" id="contactName" placeholder="Your Name">
+                    <input type="email" id="contactEmailInput" placeholder="Your Email">
+                    <textarea id="contactMessage" placeholder="Your Message"></textarea>
+                    <button class="btn btn-primary" onclick="sendMessage()">Send Message</button>
+                </div>
+            </div>
+        </section>
 
-    <footer>
-      <div>© 2026 xotiic plaza</div>
-      <div class="footer-links"><a href="#" id="footerGithub">GitHub</a><a href="#" id="footerTwitter">Twitter</a></div>
-      <div class="visitor-counter" id="visitorCount">VISITORS: —</div>
-    </footer>
-  </div>
+        <footer>
+            <div>© 2025 xotiic plaza</div>
+            <div class="footer-links"><a href="#" id="footerGithub">GitHub</a><a href="#" id="footerTwitter">Twitter</a></div>
+            <div class="visitor-counter" id="visitorCount">VISITORS: —</div>
+        </footer>
+    </div>
 </div>
 
-<!-- OWNER VIEW -->
+<!-- Owner Panel -->
 <div class="owner-view">
-  <div class="container owner-panel">
-    <div id="loginSection" class="login-box">
-      <h2>OWNER LOGIN</h2>
-      <input type="password" id="ownerPassword" placeholder="Enter password">
-      <div class="error-message" id="loginError">Incorrect password</div>
-      <button onclick="checkOwnerPassword()">ACCESS PANEL</button>
-      <p style="color:#1e1e1e;margin-top:18px;font-size:11px;"><a href="/" style="color:#8b0000;">← Back to site</a></p>
+    <div class="owner-panel">
+        <div id="loginBox" class="login-box">
+            <h2>OWNER LOGIN</h2>
+            <input type="password" id="ownerPassword" placeholder="Enter password">
+            <div id="loginError" style="color:#ff3300;display:none;">Wrong password</div>
+            <button onclick="ownerLogin()">ACCESS PANEL</button>
+            <p style="color:#333;margin-top:15px;"><a href="/" style="color:#ff3300;">← Back to site</a></p>
+        </div>
+        <div id="adminPanel" style="display:none;">
+            <div class="admin-panel">
+                <div class="admin-header">
+                    <h2>OWNER CONTROL PANEL</h2>
+                    <button class="logout-btn" onclick="ownerLogout()">LOGOUT</button>
+                </div>
+                <div class="admin-section">
+                    <h3>Personal Info</h3>
+                    <div class="admin-form-group"><label>Name</label><input type="text" id="adminName"></div>
+                    <div class="admin-form-group"><label>Bio</label><textarea id="adminBio"></textarea></div>
+                    <div class="admin-form-group"><label>Status</label><input type="text" id="adminStatus"></div>
+                </div>
+                <div class="admin-section">
+                    <h3>Statistics</h3>
+                    <div class="admin-row">
+                        <div class="admin-form-group"><label>Projects Count</label><input type="text" id="adminProjectCount"></div>
+                        <div class="admin-form-group"><label>Downloads Count</label><input type="text" id="adminDownloadCount"></div>
+                        <div class="admin-form-group"><label>Users Count</label><input type="text" id="adminUserCount"></div>
+                        <div class="admin-form-group"><label>Visitors</label><input type="text" id="adminVisitorCount"></div>
+                    </div>
+                </div>
+                <div class="admin-section">
+                    <h3>Contact</h3>
+                    <div class="admin-row">
+                        <div class="admin-form-group"><label>Email</label><input type="text" id="adminEmail"></div>
+                        <div class="admin-form-group"><label>Discord</label><input type="text" id="adminDiscord"></div>
+                        <div class="admin-form-group"><label>GitHub</label><input type="text" id="adminGithub"></div>
+                        <div class="admin-form-group"><label>Twitter</label><input type="text" id="adminTwitter"></div>
+                    </div>
+                </div>
+                <div class="admin-section">
+                    <h3>Terminal Skills</h3>
+                    <div class="admin-form-group"><input type="text" id="adminTerminalSkills"></div>
+                </div>
+                <div class="admin-section">
+                    <h3>Projects</h3>
+                    <div id="projectsAdminList"></div>
+                    <button class="admin-btn secondary" onclick="addProject()">+ Add Project</button>
+                </div>
+                <div class="admin-section">
+                    <h3>Skills</h3>
+                    <div id="skillsAdminList"></div>
+                    <button class="admin-btn secondary" onclick="addSkill()">+ Add Skill</button>
+                </div>
+                <button class="admin-btn" onclick="saveAllData()">SAVE ALL CHANGES</button>
+            </div>
+        </div>
     </div>
-    <div id="adminPanel" style="display:none">
-      <div class="admin-header"><h2>OWNER CONTROL PANEL</h2><button class="logout-btn" onclick="logoutOwner()">LOGOUT</button></div>
-      <div class="admin-dashboard">
-        <div class="admin-section"><h3>Personal Info</h3>
-          <div class="admin-form-group"><label>Name</label><input type="text" id="adminName" value="XOTIIC"></div>
-          <div class="admin-form-group"><label>Bio</label><textarea id="adminBio">Full-stack developer specializing in modern websites and powerful Discord bots.</textarea></div>
-          <div class="admin-form-group"><label>Status</label><input type="text" id="adminStatus" value="Building the future"></div>
-        </div>
-        <div class="admin-section"><h3>Statistics</h3>
-          <div class="admin-row">
-            <div class="admin-form-group"><label>Projects</label><input type="text" id="adminProjectCount"></div>
-            <div class="admin-form-group"><label>Downloads</label><input type="text" id="adminDownloadCount"></div>
-            <div class="admin-form-group"><label>Users</label><input type="text" id="adminUserCount"></div>
-            <div class="admin-form-group"><label>Visitors</label><input type="text" id="adminVisitorCount"></div>
-          </div>
-        </div>
-        <div class="admin-section"><h3>Contact</h3>
-          <div class="admin-row">
-            <div class="admin-form-group"><label>Email</label><input type="email" id="adminContactEmail" value="xotiic@example.com"></div>
-            <div class="admin-form-group"><label>Discord</label><input type="text" id="adminContactDiscord" value="xotiic"></div>
-            <div class="admin-form-group"><label>GitHub</label><input type="text" id="adminContactGithub" value="github.com/xotiic"></div>
-            <div class="admin-form-group"><label>Twitter</label><input type="text" id="adminContactTwitter" value="@xotiic"></div>
-          </div>
-        </div>
-        <div class="admin-section"><h3>Terminal Skills</h3>
-          <div class="admin-form-group"><input type="text" id="adminTerminalSkills" value="HTML/CSS • JavaScript • Python • Discord.js • React"></div>
-        </div>
-        <div class="admin-section"><h3>Projects</h3><div id="projectsAdminContainer"></div><button class="admin-btn secondary" onclick="addProjectField()">+ Add Project</button></div>
-        <div class="admin-section"><h3>Skills</h3><div id="skillsAdminContainer"></div><button class="admin-btn secondary" onclick="addSkillField()">+ Add Skill</button></div>
-        <button class="admin-btn" onclick="saveAllChanges()">SAVE ALL CHANGES</button>
-      </div>
-    </div>
-  </div>
 </div>
 
 <script>
-// Cursor
-const cur=document.getElementById('cursor'),curR=document.getElementById('cursor-ring');
-let mx=0,my=0,rx=0,ry=0;
-document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
-function tickCursor(){
-  cur.style.left=mx+'px';cur.style.top=my+'px';
-  rx+=(mx-rx)*0.1;ry+=(my-ry)*0.1;
-  curR.style.left=rx+'px';curR.style.top=ry+'px';
-  requestAnimationFrame(tickCursor);
+// Custom Cursor
+const cursor = document.querySelector('.cursor');
+const cursorRing = document.querySelector('.cursor-ring');
+let mouseX = 0, mouseY = 0;
+let ringX = 0, ringY = 0;
+
+document.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    cursor.style.transform = `translate(${mouseX}px, ${mouseY}px)`;
+    
+    // Create trail particles
+    createTrailParticle(mouseX, mouseY);
+});
+
+function animateRing() {
+    ringX += (mouseX - ringX) * 0.15;
+    ringY += (mouseY - ringY) * 0.15;
+    cursorRing.style.transform = `translate(${ringX}px, ${ringY}px)`;
+    requestAnimationFrame(animateRing);
 }
-tickCursor();
+animateRing();
 
-// Canvas Portal Effect
-const canvas=document.getElementById('c');
-const ctx=canvas.getContext('2d');
-let W,H,CX,CY;
-
-function resizeCanvas(){
-  W=canvas.width=window.innerWidth;
-  H=canvas.height=window.innerHeight;
-  CX=W/2;CY=H/2;
-}
-resizeCanvas();
-window.addEventListener('resize',resizeCanvas);
-
-// Particles
-class Particle{
-  constructor(){
-    this.spawn();
-  }
-  spawn(){
-    const a=Math.random()*Math.PI*2;
-    const r=185+Math.random()*70;
-    this.x=CX+Math.cos(a)*r;
-    this.y=CY+Math.sin(a)*r;
-    this.life=0;
-    this.maxLife=60+Math.random()*80;
-    this.sz=0.8+Math.random()*2;
-    this.sp=0.3+Math.random()*1;
-    this.col=`${100+Math.random()*155},${Math.random()*60},0`;
-  }
-  update(){
-    this.life++;
-    const dx=CX-this.x,dy=CY-this.y;
-    const d=Math.hypot(dx,dy)||1;
-    this.x+=dx/d*this.sp*0.6;
-    this.y+=dy/d*this.sp*0.6;
-    if(this.life>this.maxLife||Math.hypot(this.x-CX,this.y-CY)<45)this.spawn();
-  }
-  draw(){
-    const alpha=Math.min(1,this.life/10)*(1-this.life/this.maxLife)*0.7;
-    ctx.save();
-    ctx.globalAlpha=alpha;
-    ctx.fillStyle=`rgb(${this.col})`;
-    ctx.beginPath();
-    ctx.arc(this.x,this.y,this.sz,0,Math.PI*2);
-    ctx.fill();
-    ctx.restore();
-  }
+function createTrailParticle(x, y) {
+    const trail = document.createElement('div');
+    trail.className = 'cursor-trail';
+    trail.style.left = x + 'px';
+    trail.style.top = y + 'px';
+    document.body.appendChild(trail);
+    setTimeout(() => trail.remove(), 300);
 }
 
-let particles=[];
-for(let i=0;i<120;i++)particles.push(new Particle());
-
-let portalActive=true;
-let frameTime=0;
-
-function drawPortal(){
-  if(!portalActive) return;
-  ctx.clearRect(0,0,W,H);
-  
-  // Stars
-  ctx.fillStyle='#000';
-  ctx.fillRect(0,0,W,H);
-  for(let i=0;i<300;i++){
-    ctx.globalAlpha=0.1+Math.random()*0.3;
-    ctx.fillStyle='#fff';
-    ctx.beginPath();
-    ctx.arc((i*131)%W,(i*97)%H,0.5+Math.random()*1,0,Math.PI*2);
-    ctx.fill();
-  }
-  
-  // Outer glow
-  const pulse=0.7+Math.sin(frameTime)*0.2;
-  const grad=ctx.createRadialGradient(CX,CY,150,CX,CY,280);
-  grad.addColorStop(0,'rgba(0,0,0,0)');
-  grad.addColorStop(0.4,`rgba(100,0,0,${0.1*pulse})`);
-  grad.addColorStop(0.7,`rgba(200,30,0,${0.2*pulse})`);
-  grad.addColorStop(1,'rgba(0,0,0,0)');
-  ctx.fillStyle=grad;
-  ctx.fillRect(0,0,W,H);
-  
-  for(let p of particles){p.update();p.draw();}
-  
-  frameTime+=0.02;
-  requestAnimationFrame(drawPortal);
+// Portal Particles
+function createPortalParticles() {
+    const container = document.getElementById('portalContainer');
+    if (!container) return;
+    
+    for (let i = 0; i < 80; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'energy-particle';
+        const angle = Math.random() * Math.PI * 2;
+        const radius = 200 + Math.random() * 100;
+        const x = Math.cos(angle) * radius;
+        const y = Math.sin(angle) * radius;
+        particle.style.left = `calc(50% + ${x}px)`;
+        particle.style.top = `calc(50% + ${y}px)`;
+        particle.style.setProperty('--dx', `${(Math.random() - 0.5) * 300}px`);
+        particle.style.setProperty('--dy', `${(Math.random() - 0.5) * 300}px`);
+        particle.style.animation = `particleFloat ${1 + Math.random() * 2}s ease-out forwards`;
+        container.appendChild(particle);
+        setTimeout(() => particle.remove(), 2000);
+    }
 }
-drawPortal();
 
-// Enter Portal
-function enterPortal(){
-  portalActive=false;
-  const wrap=document.getElementById('portal-wrap');
-  wrap.classList.add('gone');
-  setTimeout(()=>{
-    wrap.style.display='none';
-    document.getElementById('main').classList.add('show');
-    loadSiteData();
-  },1300);
+setInterval(createPortalParticles, 800);
+
+// Lightning effect
+function createLightning() {
+    const container = document.getElementById('portalContainer');
+    if (!container) return;
+    
+    const lightning = document.createElement('div');
+    lightning.className = 'lightning';
+    const angle = Math.random() * Math.PI * 2;
+    const radius = 220;
+    const x = Math.cos(angle) * radius;
+    const y = Math.sin(angle) * radius;
+    const x2 = Math.cos(angle + (Math.random() - 0.5) * 0.5) * (radius + 30);
+    const y2 = Math.sin(angle + (Math.random() - 0.5) * 0.5) * (radius + 30);
+    
+    lightning.style.left = `calc(50% + ${x}px)`;
+    lightning.style.top = `calc(50% + ${y}px)`;
+    lightning.style.width = `${Math.hypot(x2 - x, y2 - y)}px`;
+    lightning.style.height = '2px';
+    lightning.style.transform = `rotate(${Math.atan2(y2 - y, x2 - x)}rad)`;
+    lightning.style.transformOrigin = 'left center';
+    lightning.style.animation = 'lightningFlash 0.1s ease-out';
+    container.appendChild(lightning);
+    setTimeout(() => lightning.remove(), 100);
 }
-setTimeout(()=>{if(document.getElementById('portal-wrap').style.display!='none')enterPortal();},5000);
 
-// Data Management
-let siteData={
-  name:'XOTIIC',
-  bio:'Full-stack developer specializing in modern websites and powerful Discord bots. Creating immersive digital experiences.',
-  status:'Building the future',
-  projectCount:'',
-  downloadCount:'',
-  userCount:'',
-  visitorCount:'',
-  email:'xotiic@example.com',
-  discord:'xotiic',
-  github:'github.com/xotiic',
-  twitter:'@xotiic',
-  terminalSkills:'HTML/CSS • Python • Discord.js',
-  projects:[],
-  skills:[]
+setInterval(createLightning, 3000);
+
+// Portal enter animation
+function enterSite() {
+    const overlay = document.getElementById('portalOverlay');
+    overlay.classList.add('hide');
+    
+    // Create zoom effect particles
+    for (let i = 0; i < 200; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'energy-particle';
+        particle.style.left = '50%';
+        particle.style.top = '50%';
+        particle.style.width = `${5 + Math.random() * 10}px`;
+        particle.style.height = `${5 + Math.random() * 10}px`;
+        particle.style.setProperty('--dx', `${(Math.random() - 0.5) * 800}px`);
+        particle.style.setProperty('--dy', `${(Math.random() - 0.5) * 800}px`);
+        particle.style.animation = `particleFloat 0.8s ease-out forwards`;
+        document.body.appendChild(particle);
+        setTimeout(() => particle.remove(), 800);
+    }
+    
+    setTimeout(() => {
+        overlay.style.display = 'none';
+        document.getElementById('mainSite').classList.add('visible');
+        loadData();
+        
+        // Animate skill bars
+        setTimeout(() => {
+            document.querySelectorAll('.skill-fill').forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => { bar.style.width = width; }, 100);
+            });
+        }, 500);
+    }, 1500);
+}
+
+document.getElementById('enterBtn').addEventListener('click', enterSite);
+setTimeout(() => {
+    if (document.getElementById('portalOverlay').style.display !== 'none') enterSite();
+}, 6000);
+
+// Data management
+let siteData = {
+    name: 'XOTIIC',
+    bio: 'Full-stack developer specializing in modern websites and powerful Discord bots. Creating immersive digital experiences.',
+    status: 'Building the future',
+    projectCount: '',
+    downloadCount: '',
+    userCount: '',
+    visitorCount: '',
+    email: 'xotiic@example.com',
+    discord: 'xotiic',
+    github: 'github.com/xotiic',
+    twitter: '@xotiic',
+    terminalSkills: 'HTML/CSS • JavaScript • Python • Discord.js • React',
+    projects: [],
+    skills: []
 };
 
-function loadSiteData(){
-  const saved=localStorage.getItem('xotiicSiteData');
-  if(saved)siteData=JSON.parse(saved);
-  renderSite();
+let currentFilter = 'all';
+
+async function loadData() {
+    try {
+        const res = await fetch('/api/data');
+        const data = await res.json();
+        siteData = data;
+    } catch(e) {
+        const saved = localStorage.getItem('xotiicData');
+        if(saved) siteData = JSON.parse(saved);
+    }
+    renderSite();
 }
 
-function renderSite(){
-  document.getElementById('userName').textContent=siteData.name;
-  document.getElementById('userBio').textContent=siteData.bio;
-  document.getElementById('terminalName').innerHTML='&gt; '+siteData.name.toLowerCase();
-  document.getElementById('terminalSkills').innerHTML='&gt; '+siteData.terminalSkills;
-  document.getElementById('terminalStatus').innerHTML='&gt; '+siteData.status;
-  document.getElementById('projectCount').textContent=siteData.projectCount||'—';
-  document.getElementById('downloadCount').textContent=siteData.downloadCount||'—';
-  document.getElementById('userCount').textContent=siteData.userCount||'—';
-  document.getElementById('visitorCount').textContent='VISITORS: '+(siteData.visitorCount||'—');
-  document.getElementById('contactEmail').textContent=siteData.email;
-  document.getElementById('contactDiscord').textContent=siteData.discord;
-  document.getElementById('contactGithub').textContent=siteData.github;
-  document.getElementById('contactTwitter').textContent=siteData.twitter;
-  document.getElementById('footerGithub').textContent=siteData.github.split('/').pop()||'GitHub';
-  document.getElementById('footerTwitter').textContent=siteData.twitter;
-  renderProjects(siteData.projects);
-  renderSkills(siteData.skills);
+function renderSite() {
+    document.getElementById('userName').textContent = siteData.name;
+    document.getElementById('userBio').textContent = siteData.bio;
+    document.getElementById('terminalName').innerHTML = '&gt; ' + siteData.name.toLowerCase();
+    document.getElementById('terminalSkills').innerHTML = '&gt; ' + siteData.terminalSkills;
+    document.getElementById('terminalStatus').innerHTML = '&gt; ' + siteData.status;
+    document.getElementById('projectCount').textContent = siteData.projectCount || '—';
+    document.getElementById('downloadCount').textContent = siteData.downloadCount || '—';
+    document.getElementById('userCount').textContent = siteData.userCount || '—';
+    document.getElementById('visitorCount').textContent = 'VISITORS: ' + (siteData.visitorCount || '—');
+    document.getElementById('contactEmail').textContent = siteData.email;
+    document.getElementById('contactDiscord').textContent = siteData.discord;
+    document.getElementById('contactGithub').textContent = siteData.github;
+    document.getElementById('contactTwitter').textContent = siteData.twitter;
+    renderProjects();
+    renderSkills();
 }
 
-let currentFilter='all';
-function filterProjects(cat,btn){
-  currentFilter=cat;
-  renderProjects(siteData.projects);
+function renderProjects() {
+    const grid = document.getElementById('projectsGrid');
+    let filtered = siteData.projects || [];
+    if(currentFilter !== 'all') filtered = filtered.filter(p => p.category === currentFilter);
+    
+    if(!filtered.length) {
+        grid.innerHTML = '<div class="empty-block">No projects yet. Add them in the owner panel at /owner</div>';
+        return;
+    }
+    
+    grid.innerHTML = filtered.map(p => `
+        <div class="project-card">
+            <div class="project-image">${p.emoji || '◈'}</div>
+            <div class="project-content">
+                <div class="cat-badge">${p.category || 'PROJECT'}</div>
+                <div class="project-title">${escapeHtml(p.title || 'Untitled')}</div>
+                <div class="project-desc">${escapeHtml(p.description || '')}</div>
+                <div class="project-tech">${(p.tags || '').split(',').filter(t=>t.trim()).map(t=>`<span class="tech-tag">${t.trim()}</span>`).join('')}</div>
+                ${p.link ? `<a href="${p.link}" class="project-link" target="_blank">→ View</a>` : ''}
+                ${p.download ? `<a href="${p.download}" class="download-link" target="_blank">↓ Download</a>` : ''}
+            </div>
+        </div>
+    `).join('');
 }
 
-function renderProjects(projects){
-  const grid=document.getElementById('projectsGrid');
-  let filtered=projects;
-  if(currentFilter!=='all')filtered=projects.filter(p=>p.category===currentFilter);
-  if(!filtered.length){
-    grid.innerHTML='<div class="empty-block">No projects yet. Add them in the owner panel.</div>';
-    return;
-  }
-  grid.innerHTML=filtered.map(p=>`
-    <div class="project-card">
-      <div class="project-image">${p.emoji||'◈'}</div>
-      <div class="project-content">
-        <div class="cat-badge">${p.category||'PROJECT'}</div>
-        <div class="project-title">${p.title||'Untitled'}</div>
-        <div class="project-desc">${p.description||''}</div>
-        <div class="project-tech">${(p.tags||'').split(',').filter(t=>t.trim()).map(t=>`<span class="tech-tag">${t.trim()}</span>`).join('')}</div>
-        ${p.link?`<a href="${p.link}" class="project-link" target="_blank">→ View</a>`:''}
-        ${p.download?`<a href="${p.download}" class="download-link" target="_blank">↓ Download</a>`:''}
-      </div>
-    </div>`).join('');
+function renderSkills() {
+    const container = document.getElementById('skillsContainer');
+    if(!siteData.skills || !siteData.skills.length) {
+        container.innerHTML = '<div class="empty-block">No skills added yet.</div>';
+        return;
+    }
+    container.innerHTML = siteData.skills.map(s => `
+        <div class="skill-item">
+            <div class="skill-header"><span>${s.name || 'Skill'}</span><span>${s.level || 0}%</span></div>
+            <div class="skill-bar"><div class="skill-fill" style="width:${s.level || 0}%"></div></div>
+        </div>
+    `).join('');
 }
 
-function renderSkills(skills){
-  const container=document.getElementById('skillsContainer');
-  if(!skills.length){
-    container.innerHTML='<div class="empty-block" style="grid-column:1/-1">No skills added yet. Add them in the owner panel.</div>';
-    return;
-  }
-  container.innerHTML=skills.map(s=>`
-    <div>
-      <div class="skill-header"><span>${s.name||'Skill'}</span><span>${s.level||0}%</span></div>
-      <div class="skill-bar-bg"><div class="skill-bar-fill" style="width:${s.level||0}%"></div></div>
-    </div>`).join('');
+function filterProjects(cat) {
+    currentFilter = cat;
+    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    renderProjects();
 }
 
-function sendMessage(){
-  const name=document.getElementById('contactName').value;
-  const email=document.getElementById('contactEmailInput').value;
-  const msg=document.getElementById('contactMessage').value;
-  if(!name||!email||!msg){alert('Please fill all fields.');return;}
-  alert('Message sent!');
-  document.getElementById('contactName').value='';
-  document.getElementById('contactEmailInput').value='';
-  document.getElementById('contactMessage').value='';
+function sendMessage() {
+    const name = document.getElementById('contactName').value;
+    const email = document.getElementById('contactEmailInput').value;
+    const msg = document.getElementById('contactMessage').value;
+    if(!name || !email || !msg) { alert('Fill all fields'); return; }
+    alert('Message sent!');
+    document.getElementById('contactName').value = '';
+    document.getElementById('contactEmailInput').value = '';
+    document.getElementById('contactMessage').value = '';
 }
 
-// Owner Functions
-function checkOwnerPassword(){
-  const pass=document.getElementById('ownerPassword').value;
-  if(pass==='xotiic2025'){
-    document.getElementById('loginSection').style.display='none';
-    document.getElementById('adminPanel').style.display='block';
-    loadAdminPanel();
-  }else{
-    document.getElementById('loginError').style.display='block';
-  }
+function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+
+// Owner functions
+function ownerLogin() {
+    const pass = document.getElementById('ownerPassword').value;
+    if(pass === 'xotiic2025') {
+        document.getElementById('loginBox').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'block';
+        loadAdminData();
+    } else {
+        document.getElementById('loginError').style.display = 'block';
+    }
 }
 
-function loadAdminPanel(){
-  document.getElementById('adminName').value=siteData.name;
-  document.getElementById('adminBio').value=siteData.bio;
-  document.getElementById('adminStatus').value=siteData.status;
-  document.getElementById('adminProjectCount').value=siteData.projectCount||'';
-  document.getElementById('adminDownloadCount').value=siteData.downloadCount||'';
-  document.getElementById('adminUserCount').value=siteData.userCount||'';
-  document.getElementById('adminVisitorCount').value=siteData.visitorCount||'';
-  document.getElementById('adminTerminalSkills').value=siteData.terminalSkills;
-  document.getElementById('adminContactEmail').value=siteData.email;
-  document.getElementById('adminContactDiscord').value=siteData.discord;
-  document.getElementById('adminContactGithub').value=siteData.github;
-  document.getElementById('adminContactTwitter').value=siteData.twitter;
-  renderProjectsAdmin();
-  renderSkillsAdmin();
+function loadAdminData() {
+    document.getElementById('adminName').value = siteData.name;
+    document.getElementById('adminBio').value = siteData.bio;
+    document.getElementById('adminStatus').value = siteData.status;
+    document.getElementById('adminProjectCount').value = siteData.projectCount;
+    document.getElementById('adminDownloadCount').value = siteData.downloadCount;
+    document.getElementById('adminUserCount').value = siteData.userCount;
+    document.getElementById('adminVisitorCount').value = siteData.visitorCount;
+    document.getElementById('adminEmail').value = siteData.email;
+    document.getElementById('adminDiscord').value = siteData.discord;
+    document.getElementById('adminGithub').value = siteData.github;
+    document.getElementById('adminTwitter').value = siteData.twitter;
+    document.getElementById('adminTerminalSkills').value = siteData.terminalSkills;
+    renderProjectsAdmin();
+    renderSkillsAdmin();
 }
 
-function renderProjectsAdmin(){
-  const container=document.getElementById('projectsAdminContainer');
-  container.innerHTML=siteData.projects.map((p,i)=>`
-    <div class="admin-item">
-      <div class="admin-item-header"><strong>${p.title||'Project '+(i+1)}</strong><button class="remove-btn" onclick="removeProject(${i})">Remove</button></div>
-      <div class="admin-row"><div class="admin-form-group"><label>Title</label><input type="text" id="projTitle${i}" value="${escapeHtml(p.title||'')}"></div>
-      <div class="admin-form-group"><label>Category</label><select id="projCat${i}"><option value="bot" ${p.category==='bot'?'selected':''}>Bot</option><option value="download" ${p.category==='download'?'selected':''}>Download</option><option value="website" ${p.category==='website'?'selected':''}>Website</option></select></div></div>
-      <div class="admin-form-group"><label>Description</label><textarea id="projDesc${i}">${escapeHtml(p.description||'')}</textarea></div>
-      <div class="admin-row"><div class="admin-form-group"><label>Tags (comma)</label><input type="text" id="projTags${i}" value="${escapeHtml(p.tags||'')}"></div>
-      <div class="admin-form-group"><label>Emoji</label><input type="text" id="projEmoji${i}" value="${escapeHtml(p.emoji||'◈')}"></div></div>
-      <div class="admin-row"><div class="admin-form-group"><label>Link</label><input type="text" id="projLink${i}" value="${escapeHtml(p.link||'')}"></div>
-      <div class="admin-form-group"><label>Download Link</label><input type="text" id="projDownload${i}" value="${escapeHtml(p.download||'')}"></div></div>
-    </div>`).join('');
+function renderProjectsAdmin() {
+    const container = document.getElementById('projectsAdminList');
+    container.innerHTML = '';
+    (siteData.projects || []).forEach((p, i) => {
+        container.innerHTML += `
+            <div class="admin-item">
+                <div class="admin-item-header"><strong>${p.title || 'Project'}</strong><button class="remove-btn" onclick="removeProject(${i})">Remove</button></div>
+                <div class="admin-form-group"><label>Title</label><input type="text" id="projTitle${i}" value="${escapeHtml(p.title || '')}"></div>
+                <div class="admin-form-group"><label>Description</label><textarea id="projDesc${i}">${escapeHtml(p.description || '')}</textarea></div>
+                <div class="admin-row">
+                    <div class="admin-form-group"><label>Category</label><select id="projCat${i}"><option value="bot" ${p.category==='bot'?'selected':''}>Bot</option><option value="download" ${p.category==='download'?'selected':''}>Download</option><option value="website" ${p.category==='website'?'selected':''}>Website</option></select></div>
+                    <div class="admin-form-group"><label>Tags</label><input type="text" id="projTags${i}" value="${escapeHtml(p.tags || '')}"></div>
+                </div>
+                <div class="admin-row">
+                    <div class="admin-form-group"><label>Emoji</label><input type="text" id="projEmoji${i}" value="${escapeHtml(p.emoji || '◈')}"></div>
+                    <div class="admin-form-group"><label>Link</label><input type="text" id="projLink${i}" value="${escapeHtml(p.link || '')}"></div>
+                </div>
+                <div class="admin-form-group"><label>Download Link</label><input type="text" id="projDownload${i}" value="${escapeHtml(p.download || '')}"></div>
+            </div>
+        `;
+    });
 }
 
-function renderSkillsAdmin(){
-  const container=document.getElementById('skillsAdminContainer');
-  container.innerHTML=siteData.skills.map((s,i)=>`
-    <div class="admin-item">
-      <div class="admin-item-header"><strong>${s.name||'Skill '+(i+1)}</strong><button class="remove-btn" onclick="removeSkill(${i})">Remove</button></div>
-      <div class="admin-row"><div class="admin-form-group"><label>Name</label><input type="text" id="skillName${i}" value="${escapeHtml(s.name||'')}"></div>
-      <div class="admin-form-group"><label>Level (0-100)</label><input type="number" id="skillLevel${i}" value="${s.level||0}" min="0" max="100"></div></div>
-    </div>`).join('');
+function renderSkillsAdmin() {
+    const container = document.getElementById('skillsAdminList');
+    container.innerHTML = '';
+    (siteData.skills || []).forEach((s, i) => {
+        container.innerHTML += `
+            <div class="admin-item">
+                <div class="admin-item-header"><strong>${s.name || 'Skill'}</strong><button class="remove-btn" onclick="removeSkill(${i})">Remove</button></div>
+                <div class="admin-row">
+                    <div class="admin-form-group"><label>Name</label><input type="text" id="skillName${i}" value="${escapeHtml(s.name || '')}"></div>
+                    <div class="admin-form-group"><label>Level</label><input type="number" id="skillLevel${i}" value="${s.level || 0}" min="0" max="100"></div>
+                </div>
+            </div>
+        `;
+    });
 }
 
-function escapeHtml(str){if(!str)return '';return str.replace(/[&<>]/g,function(m){if(m==='&')return '&amp;';if(m==='<')return '&lt;';if(m==='>')return '&gt;';return m;});}
-
-function addProjectField(){
-  siteData.projects.push({title:'',category:'website',description:'',tags:'',emoji:'◈',link:'',download:''});
-  renderProjectsAdmin();
+function addProject() {
+    if(!siteData.projects) siteData.projects = [];
+    siteData.projects.push({title:'',category:'website',description:'',tags:'',emoji:'◈',link:'',download:''});
+    renderProjectsAdmin();
 }
 
-function removeProject(i){
-  siteData.projects.splice(i,1);
-  renderProjectsAdmin();
+function removeProject(i) {
+    siteData.projects.splice(i,1);
+    renderProjectsAdmin();
 }
 
-function addSkillField(){
-  siteData.skills.push({name:'',level:80});
-  renderSkillsAdmin();
+function addSkill() {
+    if(!siteData.skills) siteData.skills = [];
+    siteData.skills.push({name:'',level:80});
+    renderSkillsAdmin();
 }
 
-function removeSkill(i){
-  siteData.skills.splice(i,1);
-  renderSkillsAdmin();
+function removeSkill(i) {
+    siteData.skills.splice(i,1);
+    renderSkillsAdmin();
 }
 
-function saveAllChanges(){
-  siteData.name=document.getElementById('adminName').value;
-  siteData.bio=document.getElementById('adminBio').value;
-  siteData.status=document.getElementById('adminStatus').value;
-  siteData.projectCount=document.getElementById('adminProjectCount').value;
-  siteData.downloadCount=document.getElementById('adminDownloadCount').value;
-  siteData.userCount=document.getElementById('adminUserCount').value;
-  siteData.visitorCount=document.getElementById('adminVisitorCount').value;
-  siteData.terminalSkills=document.getElementById('adminTerminalSkills').value;
-  siteData.email=document.getElementById('adminContactEmail').value;
-  siteData.discord=document.getElementById('adminContactDiscord').value;
-  siteData.github=document.getElementById('adminContactGithub').value;
-  siteData.twitter=document.getElementById('adminContactTwitter').value;
-  
-  // Save projects
-  for(let i=0;i<siteData.projects.length;i++){
-    siteData.projects[i].title=document.getElementById(`projTitle${i}`)?.value||'';
-    siteData.projects[i].category=document.getElementById(`projCat${i}`)?.value||'website';
-    siteData.projects[i].description=document.getElementById(`projDesc${i}`)?.value||'';
-    siteData.projects[i].tags=document.getElementById(`projTags${i}`)?.value||'';
-    siteData.projects[i].emoji=document.getElementById(`projEmoji${i}`)?.value||'◈';
-    siteData.projects[i].link=document.getElementById(`projLink${i}`)?.value||'';
-    siteData.projects[i].download=document.getElementById(`projDownload${i}`)?.value||'';
-  }
-  
-  // Save skills
-  for(let i=0;i<siteData.skills.length;i++){
-    siteData.skills[i].name=document.getElementById(`skillName${i}`)?.value||'';
-    siteData.skills[i].level=parseInt(document.getElementById(`skillLevel${i}`)?.value)||0;
-  }
-  
-  localStorage.setItem('xotiicSiteData',JSON.stringify(siteData));
-  renderSite();
-  alert('✓ All changes saved!');
+function saveAllData() {
+    siteData.name = document.getElementById('adminName').value;
+    siteData.bio = document.getElementById('adminBio').value;
+    siteData.status = document.getElementById('adminStatus').value;
+    siteData.projectCount = document.getElementById('adminProjectCount').value;
+    siteData.downloadCount = document.getElementById('adminDownloadCount').value;
+    siteData.userCount = document.getElementById('adminUserCount').value;
+    siteData.visitorCount = document.getElementById('adminVisitorCount').value;
+    siteData.email = document.getElementById('adminEmail').value;
+    siteData.discord = document.getElementById('adminDiscord').value;
+    siteData.github = document.getElementById('adminGithub').value;
+    siteData.twitter = document.getElementById('adminTwitter').value;
+    siteData.terminalSkills = document.getElementById('adminTerminalSkills').value;
+    
+    for(let i = 0; i < (siteData.projects || []).length; i++) {
+        siteData.projects[i] = {
+            title: document.getElementById(`projTitle${i}`)?.value || '',
+            description: document.getElementById(`projDesc${i}`)?.value || '',
+            category: document.getElementById(`projCat${i}`)?.value || 'website',
+            tags: document.getElementById(`projTags${i}`)?.value || '',
+            emoji: document.getElementById(`projEmoji${i}`)?.value || '◈',
+            link: document.getElementById(`projLink${i}`)?.value || '',
+            download: document.getElementById(`projDownload${i}`)?.value || ''
+        };
+    }
+    
+    for(let i = 0; i < (siteData.skills || []).length; i++) {
+        siteData.skills[i] = {
+            name: document.getElementById(`skillName${i}`)?.value || '',
+            level: parseInt(document.getElementById(`skillLevel${i}`)?.value) || 0
+        };
+    }
+    
+    localStorage.setItem('xotiicData', JSON.stringify(siteData));
+    renderSite();
+    alert('✓ All changes saved!');
 }
 
-function logoutOwner(){
-  document.body.classList.remove('owner-mode');
-  window.location.href='/';
+function ownerLogout() {
+    window.location.href = '/';
 }
 
 // Check for owner mode
-if(window.location.pathname.includes('/owner')||window.location.hash==='#owner'){
-  document.body.classList.add('owner-mode');
-  document.getElementById('portal-wrap').style.display='none';
-  document.getElementById('main').classList.add('show');
-  loadSiteData();
+if(window.location.pathname.includes('/owner') || window.location.hash === '#owner') {
+    document.body.classList.add('owner-mode');
+    document.getElementById('mainSite').classList.add('visible');
+    document.getElementById('portalOverlay').style.display = 'none';
+    loadData();
 }
 </script>
 </body>
