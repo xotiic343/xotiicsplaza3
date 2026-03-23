@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>xotiic plaza • portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000000;
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* PORTAL INTRO OVERLAY */
+        .portal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000000;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 1.5s ease-out;
+        }
+
+        .portal-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Hyperrealistic Portal Ring */
+        .portal-ring {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, 
+                rgba(139, 0, 0, 0.8) 0%,
+                rgba(255, 0, 0, 0.6) 30%,
+                rgba(100, 0, 0, 0.9) 60%,
+                rgba(0, 0, 0, 1) 100%);
+            box-shadow: 
+                0 0 50px rgba(255, 0, 0, 0.8),
+                0 0 100px rgba(139, 0, 0, 0.5),
+                inset 0 0 50px rgba(255, 0, 0, 0.3);
+            animation: portalPulse 2s ease-in-out infinite;
+        }
+
+        .portal-ring::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            border-radius: 50%;
+            background: conic-gradient(
+                from 0deg,
+                #ff0000,
+                #8b0000,
+                #ff4d4d,
+                #8b0000,
+                #ff0000
+            );
+            animation: portalSpin 3s linear infinite;
+            z-index: -1;
+        }
+
+        .portal-ring::after {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            border-radius: 50%;
+            background: radial-gradient(circle, 
+                rgba(0, 0, 0, 0.9) 0%,
+                rgba(139, 0, 0, 0.5) 50%,
+                rgba(0, 0, 0, 0) 100%);
+        }
+
+        /* Portal Core - The Void */
+        .portal-core {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: radial-gradient(circle,
+                #000000 0%,
+                #1a0000 50%,
+                #330000 80%,
+                #ff0000 100%);
+            animation: corePulse 1.5s ease-in-out infinite;
+            z-index: 2;
+        }
+
+        /* Energy Particles */
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #ff0000;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #ff0000;
+            animation: particleFloat 2s ease-out forwards;
+        }
+
+        /* Portal Text */
+        .portal-text {
+            position: absolute;
+            bottom: -80px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #ff0000;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 0 0 10px #ff0000;
+            white-space: nowrap;
+            animation: textPulse 1s ease-in-out infinite;
+        }
+
+        /* Animations */
+        @keyframes portalPulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.9;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 1;
+            }
+        }
+
+        @keyframes portalSpin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes corePulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+            50% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+        }
+
+        @keyframes particleFloat {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--dx), var(--dy)) scale(0);
+                opacity: 0;
+            }
+        }
+
+        @keyframes textPulse {
+            0%, 100% {
+                opacity: 0.5;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        @keyframes zoomIn {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(0.5);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(0);
+                opacity: 0;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Main Site - Initially Hidden */
+        .main-site {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 1s ease-in;
+        }
+
+        .main-site.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Rest of the CSS for the main site */
+        .bg-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 30%, #8b0000 0%, #1a0000 50%, #000000 100%);
+            z-index: -2;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .empty-value {
+            color: #444;
+            font-style: italic;
+        }
+
+        .empty-block {
+            background: #111;
+            border: 1px dashed #8b0000;
+            border-radius: 5px;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 2px solid #8b0000;
+            margin-bottom: 50px;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            background: linear-gradient(45deg, #ff0000, #8b0000);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo span {
+            font-size: 14px;
+            display: block;
+            letter-spacing: 2px;
+            color: #444;
+        }
+
+        nav {
+            display: flex;
+            gap: 30px;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        nav a:hover {
+            color: #ff0000;
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+            margin-bottom: 80px;
+        }
+
+        .hero-content h1 {
+            font-size: 48px;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 20px;
+        }
+
+        .hero-content h1 span {
+            color: #ff0000;
+            display: block;
+            font-size: 64px;
+            text-shadow: 0 0 30px rgba(255, 0, 0, 0.5);
+        }
+
+        .hero-content p {
+            color: #aaa;
+            margin-bottom: 30px;
+            font-size: 18px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #8b0000;
+            color: #fff;
+            border: 2px solid #8b0000;
+        }
+
+        .btn-primary:hover {
+            background: transparent;
+            color: #ff0000;
+            border-color: #ff0000;
+            transform: translateY(-3px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #fff;
+            border: 2px solid #333;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: 800;
+            color: #ff0000;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .terminal-window {
+            background: #111;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #333;
+        }
+
+        .terminal-header {
+            background: #1a1a1a;
+            padding: 10px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .terminal-dot.red { background: #ff5f56; }
+        .terminal-dot.yellow { background: #ffbd2e; }
+        .terminal-dot.green { background: #27c93f; }
+
+        .terminal-body {
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            color: #0f0;
+        }
+
+        .terminal-body .line {
+            margin: 10px 0;
+        }
+
+        .terminal-body .prompt {
+            color: #ff0000;
+        }
+
+        .section-title {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 40px;
+            border-left: 4px solid #8b0000;
+            padding-left: 20px;
+            color: #fff;
+        }
+
+        .category-filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: transparent;
+            border: 1px solid #333;
+            color: #444;
+            padding: 8px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+
+        .filter-btn.active,
+        .filter-btn:hover {
+            background: #8b0000;
+            color: #fff;
+            border-color: #8b0000;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 80px;
+        }
+
+        .project-card {
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: 0.3s;
+        }
+
+        .project-card:hover {
+            border-color: #8b0000;
+            transform: translateY(-5px);
+        }
+
+        .project-image {
+            height: 180px;
+            background: #1a1a1a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #444;
+            border-bottom: 1px solid #222;
+        }
+
+        .project-content {
+            padding: 20px;
+        }
+
+        .project-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .project-desc {
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .project-tech {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .tech-tag {
+            background: #1a1a1a;
+            color: #ff0000;
+            padding: 4px 10px;
+            font-size: 12px;
+            border-radius: 3px;
+        }
+
+        .project-link, .download-link {
+            display: inline-block;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .project-link {
+            color: #ff0000;
+        }
+
+        .download-link {
+            color: #4caf50;
+        }
+
+        .category-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #1a1a1a;
+            color: #8b0000;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .skills-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-bottom: 80px;
+        }
+
+        .skill-item {
+            margin-bottom: 20px;
+        }
+
+        .skill-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            color: #aaa;
+        }
+
+        .skill-bar-bg {
+            height: 8px;
+            background: #222;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .skill-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #8b0000, #ff0000);
+            border-radius: 4px;
+        }
+
+        .contact-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            margin-bottom: 80px;
+        }
+
+        .contact-info h3 {
+            color: #ff0000;
+            margin-bottom: 20px;
+        }
+
+        .contact-detail {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            color: #aaa;
+        }
+
+        .contact-detail i {
+            color: #ff0000;
+            width: 20px;
+        }
+
+        .contact-form input,
+        .contact-form textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            background: #111;
+            border: 1px solid #333;
+            color: #fff;
+            border-radius: 5px;
+        }
+
+        .contact-form textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        footer {
+            border-top: 1px solid #222;
+            padding: 40px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #666;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .footer-links a {
+            color: #666;
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            color: #ff0000;
+        }
+
+        .visitor-counter {
+            font-family: 'Courier New', monospace;
+            background: #111;
+            padding: 5px 15px;
+            border: 1px solid #333;
+            border-radius: 3px;
+        }
+
+        /* Owner View Styles */
+        .owner-view {
+            display: none;
+        }
+
+        body.owner-mode .main-site {
+            display: none;
+        }
+
+        body.owner-mode .owner-view {
+            display: block;
+        }
+
+        /* Owner Panel Styles */
+        .owner-panel {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .login-box {
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            max-width: 400px;
+            margin: 100px auto;
+        }
+
+        .login-box h2 {
+            color: #ff0000;
+            margin-bottom: 20px;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            color: #fff;
+            border-radius: 5px;
+        }
+
+        .login-box button {
+            width: 100%;
+            padding: 12px;
+            background: #8b0000;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .error-message {
+            color: #ff0000;
+            margin: 10px 0;
+            display: none;
+        }
+
+        .admin-dashboard {
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 30px;
+            margin-top: 30px;
+        }
+
+        .admin-section {
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #333;
+        }
+
+        .admin-section h3 {
+            color: #ff0000;
+            margin-bottom: 20px;
+        }
+
+        .admin-form-group {
+            margin-bottom: 20px;
+        }
+
+        .admin-form-group label {
+            display: block;
+            color: #aaa;
+            margin-bottom: 5px;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .admin-form-group input,
+        .admin-form-group textarea,
+        .admin-form-group select {
+            width: 100%;
+            padding: 10px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            color: #fff;
+            border-radius: 5px;
+        }
+
+        .admin-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .admin-item {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .admin-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .remove-btn {
+            background: #8b0000;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .admin-btn {
+            background: #8b0000;
+            color: #fff;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .admin-btn.secondary {
+            background: #333;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: 1px solid #8b0000;
+            color: #fff;
+            padding: 8px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                grid-template-columns: 1fr;
+            }
+            .skills-container,
+            .contact-container {
+                grid-template-columns: 1fr;
+            }
+            .portal-container {
+                width: 280px;
+                height: 280px;
+            }
+            .portal-ring {
+                width: 220px;
+                height: 220px;
+            }
+            .portal-core {
+                width: 100px;
+                height: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- PORTAL INTRO OVERLAY -->
+    <div id="portalOverlay" class="portal-overlay">
+        <div class="portal-container">
+            <div class="portal-ring"></div>
+            <div class="portal-core"></div>
+            <div class="portal-text">ENTER THE PLAZA</div>
+        </div>
+    </div>
+
+    <!-- MAIN SITE -->
+    <div id="mainSite" class="main-site">
+        <div class="bg-gradient"></div>
+
+        <div id="userView">
+            <div class="container">
+                <header>
+                    <div class="logo">
+                        XOTIIC
+                        <span>// BOTS • DOWNLOADS • WEBSITES</span>
+                    </div>
+                    <nav>
+                        <a href="#home">Home</a>
+                        <a href="#projects">Projects</a>
+                        <a href="#skills">Skills</a>
+                        <a href="#contact">Contact</a>
+                    </nav>
+                </header>
+
+                <section id="home" class="hero">
+                    <div class="hero-content">
+                        <h1>
+                            <span id="userName">XOTIIC</span>
+                            Code. Create. Innovate.
+                        </h1>
+                        <p id="userBio">Full-stack developer specializing in modern websites and powerful Discord bots. Creating immersive digital experiences.</p>
+                        <div class="hero-buttons">
+                            <a href="#projects" class="btn btn-primary">View Work</a>
+                            <a href="#contact" class="btn btn-secondary">Hire Me</a>
+                        </div>
+                        <div class="hero-stats">
+                            <div class="stat-item">
+                                <div class="stat-number" id="projectCount">—</div>
+                                <div class="stat-label">PROJECTS</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="downloadCount">—</div>
+                                <div class="stat-label">DOWNLOADS</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="userCount">—</div>
+                                <div class="stat-label">USERS</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="terminal-window">
+                        <div class="terminal-header">
+                            <div class="terminal-dot red"></div>
+                            <div class="terminal-dot yellow"></div>
+                            <div class="terminal-dot green"></div>
+                        </div>
+                        <div class="terminal-body">
+                            <div class="line"><span class="prompt">$</span> whoami</div>
+                            <div class="line" id="terminalName">> xotiic</div>
+                            <div class="line"><span class="prompt">$</span> skills --list</div>
+                            <div class="line" id="terminalSkills">> HTML/CSS • JavaScript • Python • Discord.js • React</div>
+                            <div class="line"><span class="prompt">$</span> status</div>
+                            <div class="line" id="terminalStatus">> Building the future</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="projects">
+                    <h2 class="section-title">Projects</h2>
+                    <div class="category-filters">
+                        <button class="filter-btn active" onclick="filterProjects('all')">All</button>
+                        <button class="filter-btn" onclick="filterProjects('bot')">Bots</button>
+                        <button class="filter-btn" onclick="filterProjects('download')">Downloads</button>
+                        <button class="filter-btn" onclick="filterProjects('website')">Websites</button>
+                    </div>
+                    <div class="projects-grid" id="projectsGrid"></div>
+                </section>
+
+                <section id="skills">
+                    <h2 class="section-title">Skills</h2>
+                    <div class="skills-container" id="skillsContainer"></div>
+                </section>
+
+                <section id="contact">
+                    <h2 class="section-title">Contact</h2>
+                    <div class="contact-container">
+                        <div class="contact-info">
+                            <h3>Connect With Me</h3>
+                            <div class="contact-detail"><i>📧</i><span id="contactEmail">xotiic@example.com</span></div>
+                            <div class="contact-detail"><i>💬</i><span id="contactDiscord">xotiic</span></div>
+                            <div class="contact-detail"><i>🐙</i><span id="contactGithub">github.com/xotiic</span></div>
+                            <div class="contact-detail"><i>🐦</i><span id="contactTwitter">@xotiic</span></div>
+                        </div>
+                        <div class="contact-form">
+                            <input type="text" placeholder="Your Name" id="contactName">
+                            <input type="email" placeholder="Your Email" id="contactEmailInput">
+                            <textarea placeholder="Your Message" id="contactMessage"></textarea>
+                            <button class="btn btn-primary" onclick="sendMessage()">Send Message</button>
+                        </div>
+                    </div>
+                </section>
+
+                <footer>
+                    <div>© 2025 xotiic plaza</div>
+                    <div class="footer-links">
+                        <a href="#" id="footerGithub">GitHub</a>
+                        <a href="#" id="footerTwitter">Twitter</a>
+                    </div>
+                    <div class="visitor-counter" id="visitorCount">VISITORS: —</div>
+                </footer>
+            </div>
+        </div>
+    </div>
+
+    <!-- OWNER VIEW -->
+    <div id="ownerView" class="owner-view">
+        <div class="container owner-panel">
+            <div id="loginSection" class="login-box">
+                <h2>OWNER LOGIN</h2>
+                <input type="password" id="ownerPassword" placeholder="Enter password">
+                <div class="error-message" id="loginError">Incorrect password</div>
+                <button onclick="checkOwnerPassword()">ACCESS PANEL</button>
+                <p style="color:#444; margin-top:20px;"><a href="/" style="color:#8b0000;">← Back to site</a></p>
+            </div>
+            <div id="adminPanel" style="display: none;">
+                <div class="admin-header">
+                    <h2>OWNER CONTROL PANEL</h2>
+                    <button class="logout-btn" onclick="logoutOwner()">LOGOUT</button>
+                </div>
+                <div class="admin-dashboard">
+                    <div class="admin-section">
+                        <h3>Personal Information</h3>
+                        <div class="admin-form-group"><label>Your Name</label><input type="text" id="adminName" value="XOTIIC"></div>
+                        <div class="admin-form-group"><label>Bio</label><textarea id="adminBio">Full-stack developer specializing in modern websites and powerful Discord bots. Creating immersive digital experiences.</textarea></div>
+                        <div class="admin-form-group"><label>Current Status</label><input type="text" id="adminStatus" value="Building the future"></div>
+                    </div>
+                    <div class="admin-section">
+                        <h3>Statistics</h3>
+                        <div class="admin-row">
+                            <div class="admin-form-group"><label>Project Count</label><input type="text" id="adminProjectCount" placeholder="e.g. 12"></div>
+                            <div class="admin-form-group"><label>Download Count</label><input type="text" id="adminDownloadCount" placeholder="e.g. 5K"></div>
+                            <div class="admin-form-group"><label>User Count</label><input type="text" id="adminUserCount" placeholder="e.g. 50K"></div>
+                            <div class="admin-form-group"><label>Visitor Count</label><input type="text" id="adminVisitorCount" placeholder="e.g. 1337"></div>
+                        </div>
+                    </div>
+                    <div class="admin-section">
+                        <h3>Contact Information</h3>
+                        <div class="admin-row">
+                            <div class="admin-form-group"><label>Email</label><input type="email" id="adminContactEmail" value="xotiic@example.com"></div>
+                            <div class="admin-form-group"><label>Discord</label><input type="text" id="adminContactDiscord" value="xotiic"></div>
+                            <div class="admin-form-group"><label>GitHub</label><input type="text" id="adminContactGithub" value="github.com/xotiic"></div>
+                            <div class="admin-form-group"><label>Twitter</label><input type="text" id="adminContactTwitter" value="@xotiic"></div>
+                        </div>
+                    </div>
+                    <div class="admin-section">
+                        <h3>Terminal Display</h3>
+                        <div class="admin-form-group"><label>Skills</label><input type="text" id="adminTerminalSkills" value="HTML/CSS • JavaScript • Python • Discord.js • React"></div>
+                    </div>
+                    <div class="admin-section">
+                        <h3>Projects</h3>
+                        <div id="projectsAdminContainer"></div>
+                        <button class="admin-btn secondary" onclick="addProjectField()">+ Add Project</button>
+                    </div>
+                    <div class="admin-section">
+                        <h3>Skills</h3>
+                        <div id="skillsAdminContainer"></div>
+                        <button class="admin-btn secondary" onclick="addSkillField()">+ Add Skill</button>
+                    </div>
+                    <button class="admin-btn" onclick="saveAllChanges()">SAVE ALL CHANGES</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Portal Animation
+        const portalOverlay = document.getElementById('portalOverlay');
+        const mainSite = document.getElementById('mainSite');
+        
+        function createParticles() {
+            const container = document.querySelector('.portal-container');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                const angle = Math.random() * Math.PI * 2;
+                const radius = 150 + Math.random() * 100;
+                const x = Math.cos(angle) * radius;
+                const y = Math.sin(angle) * radius;
+                particle.style.left = `calc(50% + ${x}px)`;
+                particle.style.top = `calc(50% + ${y}px)`;
+                particle.style.setProperty('--dx', `${(Math.random() - 0.5) * 200}px`);
+                particle.style.setProperty('--dy', `${(Math.random() - 0.5) * 200}px`);
+                particle.style.animationDelay = `${Math.random() * 2}s`;
+                container.appendChild(particle);
+                setTimeout(() => particle.remove(), 2000);
+            }
+        }
+        
+        setInterval(createParticles, 500);
+        
+        setTimeout(() => {
+            portalOverlay.style.animation = 'zoomIn 1s ease-out forwards';
+            setTimeout(() => {
+                portalOverlay.style.display = 'none';
+                mainSite.classList.add('visible');
+                document.querySelectorAll('.hero-content, .terminal-window, .section-title, .project-card, .skill-item, .contact-container').forEach((el, i) => {
+                    el.style.animation = `fadeIn 0.5s ease-out ${i * 0.05}s forwards`;
+                });
+            }, 1000);
+        }, 3000);
+
+        // Data Storage
+        let projects = [];
+        let skills = [];
+
+        // Load from localStorage
+        function loadFromStorage() {
+            const savedProjects = localStorage.getItem('xotiic_projects');
+            const savedSkills = localStorage.getItem('xotiic_skills');
+            if (savedProjects) projects = JSON.parse(savedProjects);
+            if (savedSkills) skills = JSON.parse(savedSkills);
+            renderUserView();
+        }
+
+        function saveToStorage() {
+            localStorage.setItem('xotiic_projects', JSON.stringify(projects));
+            localStorage.setItem('xotiic_skills', JSON.stringify(skills));
+        }
+
+        function renderUserView() {
+            const projectsGrid = document.getElementById('projectsGrid');
+            if (projects.length === 0) {
+                projectsGrid.innerHTML = '<div class="empty-block"><p>No projects added yet.</p><small>Owner can add bots, downloads, and websites at /owner</small></div>';
+            } else {
+                projectsGrid.innerHTML = projects.map(p => {
+                    let badge = '', link = '';
+                    if (p.category === 'bot') { badge = '<div class="category-badge">🤖 BOT</div>'; if (p.link) link = `<a href="${p.link}" class="project-link" target="_blank">Invite Bot →</a>`; }
+                    else if (p.category === 'download') { badge = '<div class="category-badge">📥 DOWNLOAD</div>'; if (p.download) link = `<a href="${p.download}" class="download-link" target="_blank">Download →</a>`; }
+                    else { badge = '<div class="category-badge">🌐 WEBSITE</div>'; if (p.link) link = `<a href="${p.link}" class="project-link" target="_blank">Visit Site →</a>`; }
+                    return `<div class="project-card" data-category="${p.category}"><div class="project-image">[${p.category.toUpperCase()}]</div><div class="project-content">${badge}<h3 class="project-title">${p.title || '[NO TITLE]'}</h3><p class="project-desc">${p.description || '[NO DESCRIPTION]'}</p><div class="project-tech">${(p.technologies || []).map(t => `<span class="tech-tag">${t}</span>`).join('')}</div>${link}</div></div>`;
+                }).join('');
+            }
+            const skillsContainer = document.getElementById('skillsContainer');
+            if (skills.length === 0) skillsContainer.innerHTML = '<div class="empty-block"><p>No skills added yet.</p><small>Owner can add skills at /owner</small></div>';
+            else {
+                const half = Math.ceil(skills.length / 2);
+                skillsContainer.innerHTML = `<div>${skills.slice(0, half).map(s => `<div class="skill-item"><div class="skill-header"><span>${s.name || '[SKILL]'}</span><span>${s.percent || '—'}</span></div><div class="skill-bar-bg"><div class="skill-bar-fill" style="width: ${parseInt(s.percent) || 0}%"></div></div></div>`).join('')}</div><div>${skills.slice(half).map(s => `<div class="skill-item"><div class="skill-header"><span>${s.name || '[SKILL]'}</span><span>${s.percent || '—'}</span></div><div class="skill-bar-bg"><div class="skill-bar-fill" style="width: ${parseInt(s.percent) || 0}%"></div></div></div>`).join('')}</div>`;
+            }
+        }
+
+        function renderProjectsAdmin() {
+            const container = document.getElementById('projectsAdminContainer');
+            container.innerHTML = '';
+            projects.forEach((p, i) => {
+                const div = document.createElement('div');
+                div.className = 'admin-item';
+                div.innerHTML = `<div class="admin-item-header"><h4>Project ${i+1}</h4><button class="remove-btn" onclick="removeProject(${i})">Remove</button></div>
+                    <div class="admin-form-group"><label>Title</label><input type="text" class="project-title-input" value="${escapeHtml(p.title || '')}"></div>
+                    <div class="admin-form-group"><label>Description</label><textarea class="project-desc-input">${escapeHtml(p.description || '')}</textarea></div>
+                    <div class="admin-row"><div class="admin-form-group"><label>Category</label><select class="project-category-select"><option value="bot" ${p.category==='bot'?'selected':''}>Bot</option><option value="download" ${p.category==='download'?'selected':''}>Download</option><option value="website" ${p.category==='website'?'selected':''}>Website</option></select></div>
+                    <div class="admin-form-group"><label>Technologies</label><input type="text" class="project-tech-input" value="${(p.technologies || []).join(', ')}"></div></div>
+                    <div class="admin-row"><div class="admin-form-group"><label>Project Link</label><input type="text" class="project-link-input" value="${escapeHtml(p.link || '')}"></div>
+                    <div class="admin-form-group"><label>Download Link</label><input type="text" class="project-download-input" value="${escapeHtml(p.download || '')}"></div></div>`;
+                container.appendChild(div);
+            });
+        }
+
+        function renderSkillsAdmin() {
+            const container = document.getElementById('skillsAdminContainer');
+            container.innerHTML = '';
+            skills.forEach((s, i) => {
+                const div = document.createElement('div');
+                div.className = 'admin-item';
+                div.innerHTML = `<div class="admin-item-header"><h4>Skill ${i+1}</h4><button class="remove-btn" onclick="removeSkill(${i})">Remove</button></div>
+                    <div class="admin-row"><div class="admin-form-group"><label>Skill Name</label><input type="text" class="skill-name-input" value="${escapeHtml(s.name || '')}"></div>
+                    <div class="admin-form-group"><label>Percentage</label><input type="text" class="skill-percent-input" value="${escapeHtml(s.percent || '')}"></div></div>`;
+                container.appendChild(div);
+            });
+        }
+
+        function escapeHtml(text) { if (!text) return ''; return text.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
+
+        function addProjectField() { projects.push({ title: '', description: '', category: 'website', technologies: [], link: '', download: '' }); renderProjectsAdmin(); }
+        function removeProject(i) { projects.splice(i, 1); renderProjectsAdmin(); }
+        function addSkillField() { skills.push({ name: '', percent: '' }); renderSkillsAdmin(); }
+        function removeSkill(i) { skills.splice(i, 1); renderSkillsAdmin(); }
+
+        function saveAllChanges() {
+            document.getElementById('userName').textContent = document.getElementById('adminName').value || 'XOTIIC';
+            document.getElementById('userBio').textContent = document.getElementById('adminBio').value || '';
+            document.getElementById('terminalStatus').textContent = '> ' + (document.getElementById('adminStatus').value || '');
+            document.getElementById('projectCount').textContent = document.getElementById('adminProjectCount').value || '—';
+            document.getElementById('downloadCount').textContent = document.getElementById('adminDownloadCount').value || '—';
+            document.getElementById('userCount').textContent = document.getElementById('adminUserCount').value || '—';
+            document.getElementById('visitorCount').textContent = 'VISITORS: ' + (document.getElementById('adminVisitorCount').value || '—');
+            document.getElementById('contactEmail').textContent = document.getElementById('adminContactEmail').value || '';
+            document.getElementById('contactDiscord').textContent = document.getElementById('adminContactDiscord').value || '';
+            document.getElementById('contactGithub').textContent = document.getElementById('adminContactGithub').value || '';
+            document.getElementById('contactTwitter').textContent = document.getElementById('adminContactTwitter').value || '';
+            document.getElementById('terminalSkills').textContent = '> ' + (document.getElementById('adminTerminalSkills').value || '');
+            document.getElementById('terminalName').textContent = '> ' + (document.getElementById('adminName').value.toLowerCase() || '');
+            document.getElementById('footerGithub').textContent = document.getElementById('adminContactGithub').value || 'GitHub';
+            document.getElementById('footerTwitter').textContent = document.getElementById('adminContactTwitter').value || 'Twitter';
+            
+            const projectContainers = document.querySelectorAll('#projectsAdminContainer .admin-item');
+            projects = [];
+            projectContainers.forEach(c => {
+                projects.push({
+                    title: c.querySelector('.project-title-input').value,
+                    description: c.querySelector('.project-desc-input').value,
+                    category: c.querySelector('.project-category-select').value,
+                    technologies: c.querySelector('.project-tech-input').value.split(',').map(t => t.trim()),
+                    link: c.querySelector('.project-link-input').value,
+                    download: c.querySelector('.project-download-input').value
+                });
+            });
+            const skillContainers = document.querySelectorAll('#skillsAdminContainer .admin-item');
+            skills = [];
+            skillContainers.forEach(c => {
+                skills.push({ name: c.querySelector('.skill-name-input').value, percent: c.querySelector('.skill-percent-input').value });
+            });
+            saveToStorage();
+            renderUserView();
+            alert('All changes saved!');
+        }
+
+        function filterProjects(category) {
+            const projects = document.querySelectorAll('.project-card');
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            projects.forEach(p => { p.style.display = category === 'all' || p.dataset.category === category ? 'block' : 'none'; });
+        }
+
+        function sendMessage() { alert('Message sent! (Demo)'); document.getElementById('contactName').value = ''; document.getElementById('contactEmailInput').value = ''; document.getElementById('contactMessage').value = ''; }
+
+        const OWNER_PASSWORD = "40671Mps19*";
+        function checkURL() { if (window.location.pathname === '/owner' || window.location.hash === '#owner') { document.body.classList.add('owner-mode'); document.getElementById('loginSection').style.display = 'block'; document.getElementById('adminPanel').style.display = 'none'; } else { document.body.classList.remove('owner-mode'); } }
+        function checkOwnerPassword() { if (document.getElementById('ownerPassword').value === OWNER_PASSWORD) { document.getElementById('loginSection').style.display = 'none'; document.getElementById('adminPanel').style.display = 'block'; loadAdminData(); } else { document.getElementById('loginError').style.display = 'block'; } }
+        function logoutOwner() { window.location.href = '/'; }
+        function loadAdminData() {
+            document.getElementById('adminName').value = document.getElementById('userName').textContent;
+            document.getElementById('adminBio').value = document.getElementById('userBio').textContent;
+            document.getElementById('adminStatus').value = document.getElementById('terminalStatus').textContent.replace('> ', '');
+            document.getElementById('adminProjectCount').value = document.getElementById('projectCount').textContent;
+            document.getElementById('adminDownloadCount').value = document.getElementById('downloadCount').textContent;
+            document.getElementById('adminUserCount').value = document.getElementById('userCount').textContent;
+            document.getElementById('adminVisitorCount').value = document.getElementById('visitorCount').textContent.replace('VISITORS: ', '');
+            document.getElementById('adminContactEmail').value = document.getElementById('contactEmail').textContent;
+            document.getElementById('adminContactDiscord').value = document.getElementById('contactDiscord').textContent;
+            document.getElementById('adminContactGithub').value = document.getElementById('contactGithub').textContent;
+            document.getElementById('adminContactTwitter').value = document.getElementById('contactTwitter').textContent;
+            document.getElementById('adminTerminalSkills').value = document.getElementById('terminalSkills').textContent.replace('> ', '');
+            renderProjectsAdmin(); renderSkillsAdmin();
+        }
+
+        window.onload = () => { loadFromStorage(); checkURL(); };
+        window.onpopstate = checkURL;
+    </script>
+</body>
+</html>
