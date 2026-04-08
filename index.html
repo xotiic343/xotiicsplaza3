@@ -256,18 +256,27 @@ footer a:hover{color:var(--acc);}
   <div class="cgrid">
     <div class="cinfo">
       <h3>Connect</h3>
+      <div class="cdetail"><span>📧</span><span id="cEmail">xotiic@example.com</span></div>
       <div class="cdetail"><span>💬</span><span id="cDiscord">xotiic._.420</span></div>
+      <div class="cdetail"><span>🐙</span><span id="cGithub">github.com/xotiic</span></div>
+      <div class="cdetail"><span>🐦</span><span id="cTwitter">@xotiic</span></div>
       <div style="margin-top:16px;">
-        <a href="https://discord.gg/SVvZFnct37" target="_blank" class="support-btn" id="supportBtn">
+        <a href="https://discord.gg/xotiic" target="_blank" class="support-btn" id="supportBtn">
           🎮 JOIN SUPPORT SERVER
         </a>
       </div>
+    </div>
+    <div class="cform">
+      <input placeholder="Your Name" id="fName">
+      <input placeholder="Your Email" id="fEmail">
+      <textarea placeholder="Your Message" id="fMsg"></textarea>
+      <button class="btn btn-p" onclick="sendMsg()">Send Message ✦</button>
     </div>
   </div>
 </section>
 
 <footer>
-  <div>© 2026 xotiic plaza &nbsp;|&nbsp; made with 🐱</div>
+  <div>© 2025 xotiic plaza &nbsp;|&nbsp; made with 🐱</div>
   <div><a id="fGh">GitHub</a> &nbsp;|&nbsp; <a id="fTw">Twitter</a></div>
   <div id="visitors">VISITORS: —</div>
 </footer>
@@ -440,7 +449,7 @@ function doMeow(canvas){
     g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime+0.35);
     o.start(); o.stop(ac.currentTime+0.4);
   }catch(e){}
-  setTimeout(()=>{lmeow=false;drawCat(canvas,CAT,1);},250);
+  setTimeout(()=>{lmeow=false;drawCat(lcat,CAT,1);},250);
 }
 
 drawCat(lcat, CAT, 1);
@@ -642,29 +651,46 @@ function sendMsg(){
   setTimeout(()=>alert('Message sent! I\'ll be in touch soon 🐱'),500);
 }
 
-// ======= ADMIN =======
-function openAdmin(){ document.getElementById('apanel').classList.add('open'); }
-function closeAdmin(){ document.getElementById('apanel').classList.remove('open'); }
-function closeAdminBg(e){ if(e.target===document.getElementById('apanel')) closeAdmin(); }
+// ======= ADMIN - BACKEND VERIFICATION =======
+let currentPassword = '';
 
 async function loginAdmin(){
-  const p=document.getElementById('apwd').value;
-  if(p==='xotiic2025'){
-    document.getElementById('aLogin').style.display='none';
-    document.getElementById('aControls').style.display='block';
-    document.getElementById('eName').value=D.name;
-    document.getElementById('eBio').value=D.bio;
-    document.getElementById('eStatus').value=D.status;
-    document.getElementById('eEmail').value=D.email;
-    document.getElementById('eDiscord').value=D.discord;
-    document.getElementById('eGithub').value=D.github;
-    document.getElementById('eTwitter').value=D.twitter;
-    document.getElementById('eTSkills').value=D.terminalSkills;
-    document.getElementById('eProjCount').value=D.projCount;
-    document.getElementById('eDlCount').value=D.dlCount;
-    document.getElementById('eUserCount').value=D.userCount;
-    renderProjectList();
-  } else { alert('Wrong password!'); }
+  const pwd = document.getElementById('apwd').value;
+  if(!pwd) {
+    alert('Enter password');
+    return;
+  }
+  
+  // Verify password with backend
+  try {
+    const testRes = await fetch(`${API_BASE}/api/data?password=${encodeURIComponent(pwd)}`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({}) // empty body just to test
+    });
+    
+    if(testRes.ok) {
+      currentPassword = pwd;
+      document.getElementById('aLogin').style.display='none';
+      document.getElementById('aControls').style.display='block';
+      document.getElementById('eName').value=D.name;
+      document.getElementById('eBio').value=D.bio;
+      document.getElementById('eStatus').value=D.status;
+      document.getElementById('eEmail').value=D.email;
+      document.getElementById('eDiscord').value=D.discord;
+      document.getElementById('eGithub').value=D.github;
+      document.getElementById('eTwitter').value=D.twitter;
+      document.getElementById('eTSkills').value=D.terminalSkills;
+      document.getElementById('eProjCount').value=D.projCount;
+      document.getElementById('eDlCount').value=D.dlCount;
+      document.getElementById('eUserCount').value=D.userCount;
+      renderProjectList();
+    } else {
+      alert('Access denied');
+    }
+  } catch(e) {
+    alert('Backend connection error');
+  }
 }
 
 function renderProjectList(){
@@ -754,17 +780,22 @@ async function saveAll(){
   D.dlCount=document.getElementById('eDlCount').value;
   D.userCount=document.getElementById('eUserCount').value;
   
-  const saved = await saveToBackend(document.getElementById('apwd').value);
+  const saved = await saveToBackend(currentPassword);
   renderAll();
-  alert(saved ? 'Saved to backend! ✦' : 'Saved locally!');
+  alert(saved ? 'Saved to backend! ✦' : 'Save failed - check password');
 }
 
 function logoutAdmin(){
   document.getElementById('aControls').style.display='none';
   document.getElementById('aLogin').style.display='block';
   document.getElementById('apwd').value='';
+  currentPassword = '';
   closeAdmin();
 }
+
+function openAdmin(){ document.getElementById('apanel').classList.add('open'); }
+function closeAdmin(){ document.getElementById('apanel').classList.remove('open'); }
+function closeAdminBg(e){ if(e.target===document.getElementById('apanel')) closeAdmin(); }
 
 // ======= KONAMI CODE =======
 const KONAMI = [38,38,40,40,37,39,37,39,66,65];
